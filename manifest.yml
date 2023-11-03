@@ -1,0 +1,28 @@
+permissions:
+  external:
+    fetch:
+      backend:
+        - www.mermaidchart.com
+  scopes:
+    - storage:app
+modules:
+  macro:
+    - key: mchart
+      function: main
+      title: Mermaid chart
+      description: Inserts Hello world!
+      config:
+        function: config-function-key
+  confluence:globalSettings:
+    - key: mchart-settings
+      function: main-settings
+      title: Mermaid Chart Settings
+  function:
+    - key: main
+      handler: index.run
+    - key: config-function-key
+      handler: index.config
+    - key: main-settings
+      handler: settings.run
+app:
+  id: ari:cloud:ecosystem::app/a97a7610-c98d-4760-9f05-bc21cfc3ddda
