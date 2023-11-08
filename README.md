@@ -36,3 +36,6 @@ forge tunnel
 
 See [Get help](https://developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
 # confluence-mermaid-chart-plugin
+
+![alt text for screen readers]([/path/to/image.png](https://www.mermaidchart.com/raw/c2f481f9-433f-4491-a9d4-811d7150122f?version=v0.1&theme=light&format=png)https://www.mermaidchart.com/raw/c2f481f9-433f-4491-a9d4-811d7150122f?version=v0.1&theme=light&format=png "Text to show on mouseover")
+
