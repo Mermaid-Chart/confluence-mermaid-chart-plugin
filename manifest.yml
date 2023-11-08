@@ -1,5 +1,7 @@
 permissions:
   external:
+    images:
+      - https://www.mermaidchart.com/*
     fetch:
       backend:
         - www.mermaidchart.com
@@ -10,7 +12,7 @@ modules:
     - key: mchart
       function: main
       title: Mermaid chart
-      description: Inserts Hello world!
+      description: Mermaid charts
       config:
         function: config-function-key
   confluence:globalSettings:

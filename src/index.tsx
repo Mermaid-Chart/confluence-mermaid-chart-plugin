@@ -1,40 +1,48 @@
-// Import required components from the UI kit
 import ForgeUI, {
   Macro,
   render,
   Text,
   Fragment,
   Image,
-  MacroConfig,
-  TextField,
-  useConfig,
-  useState, useEffect,
+  useState, Select, Option, MacroConfig, useConfig, SectionMessage,
 } from '@forge/ui'
-import {MermaidChartAPI} from './mermaidAPI';
-import { storage } from '@forge/api'
-import { TOKEN_KEY } from './settings'
+import {
+  buildDiagramUrl,
+  fetchDocument,
+  fetchDocuments,
+  fetchProjects,
+  MCDocument,
+} from './api'
 
-// ImageCardProps interface which will be used by ImageCard component
-interface ImageCardProps {
-  title: string;
-  src: string;
+type ConfigType = {
+  documentID?: string
 }
 
-// ImageCard component containing text and image
-const ImageCard = ({title, src}: ImageCardProps) => (
-  <Fragment>
-    <Text>{title}</Text>
-    <Image src={src} alt={title}/>
-  </Fragment>
-);
-
-// App function will return the final output
 const App = () => {
-  const config = useConfig();
+  const config = (useConfig() || {}) as ConfigType;
+  const [document] = useState(async () => {
+    if (!config.documentID) return;
+    return await fetchDocument(config.documentID);
+  })
+  const [diagramUrls] = useState(async () => {
+    return document && await buildDiagramUrl(document);
+  })
+
+  if (!diagramUrls) {
+    return (
+      <SectionMessage title="You need to configure this macro" appearance="warning">
+        <Text>
+          While editing the page, select the macro, and click on the pencil icon
+          to display configuration options.
+        </Text>
+      </SectionMessage>
+    )
+  }
 
   return (
     <Fragment>
-      <Text>Random GIF!</Text>
+      <Text>{document.title}</Text>
+      <Image src={diagramUrls.png} alt={document.title} />
     </Fragment>
   );
 };
@@ -45,29 +53,36 @@ export const run = render(
   />
 );
 
+type OptionType = {
+  id: string;
+  title: string;
+}
 const Config = () => {
-  const [token] = useState(async () => {
-    return await storage.getSecret(TOKEN_KEY)
+  const [options] = useState<OptionType[]>(async () => {
+    const projects = await fetchProjects();
+    const dp = [];
+    projects.map((p) => dp.push(fetchDocuments(p.id)));
+    const docResult: MCDocument[][] = await Promise.all(dp);
+    const result: OptionType[] = [];
+    projects.map((p, idx) => {
+      (docResult[idx] || []).map((doc) => {
+        result.push({
+          id: doc.documentID,
+          title: `${p.title}/${doc.title}`
+        })
+      });
+    })
+
+    return result;
   });
-  const [client, setClient] = useState<MermaidChartAPI | undefined>(undefined);
-
-  useEffect(() => {
-    if (!token) return;
-    setClient(new MermaidChartAPI({
-      token,
-      // @TODO add baseURL
-    }))
-  }, [token])
-
-  useEffect(() => {
-    if (!client) return;
-    client.getProjects();
-  }, [client])
 
   return (
     <MacroConfig>
-      {/* Form components */}
-      <TextField name="age" label="Pet age" />
+      <Select label="Diagram" name="documentID">
+        {options.map((p) => (
+          <Option label={p.title} value={p.id} />
+        ))}
+      </Select>
     </MacroConfig>
   );
 };
