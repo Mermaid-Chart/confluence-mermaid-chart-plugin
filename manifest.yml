@@ -9,7 +9,7 @@ permissions:
     - storage:app
 modules:
   macro:
-    - key: mchart
+    - key: mermaid
       function: main
       title: Mermaid chart
       description: Mermaid charts

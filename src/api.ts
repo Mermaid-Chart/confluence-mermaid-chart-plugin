@@ -34,31 +34,33 @@ const request = async (path: string, newToken?: string) => {
   if (response.status > 400) {
     throw new Error("Authentication error, please check access token in settings");
   }
+
+  return response;
+}
+const requestJSON = async (path: string, newToken?: string) => {
+  const response = await request(path, newToken);
+
   return await response.json();
 }
 
 export const fetchProjects = async (): Promise<MCProject[]> => {
-  return request('rest-api/projects');
+  return requestJSON('rest-api/projects');
 }
 
 export const fetchDocuments = async (projectId: string): Promise<MCDocument[]> => {
-  return request(`rest-api/projects/${projectId}/documents`);
+  return requestJSON(`rest-api/projects/${projectId}/documents`);
 }
 
 export const fetchDocument = async (documentID: string): Promise<MCDocument> => {
-  return request(`/rest-api/documents/${documentID}`);
+  return requestJSON(`/rest-api/documents/${documentID}`);
 }
 
 export const fetchCurrentUser = async (token: string): Promise<MCUser> => {
-  return request('/rest-api/users/me', token);
+  return requestJSON('/rest-api/users/me', token);
 }
 
-export const buildDiagramUrl = async (document: MCDocument) => {
-  const baseUrl = await storage.get(BASE_URL_KEY);
-  const base = `${baseUrl}raw/${document.documentID}?version=v${document.major}.${document.minor}&theme=light&format=`;
-  return {
-    html: base + "html",
-    svg: base + "svg",
-    png: base + "png",
-  };
+export const fetchDiagramSVG = async (document: MCDocument) => {
+  const response = await request(`raw/${document.documentID}?version=v${document.major}.${document.minor}&theme=light&format=svg`);
+
+  return await response.text();
 }

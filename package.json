@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@forge/api": "^2.19.4",
-    "@forge/ui": "^1.9.9"
+    "@forge/ui": "^1.9.9",
+    "base-64": "^1.0.0"
   }
 }

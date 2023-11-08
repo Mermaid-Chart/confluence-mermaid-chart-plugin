@@ -7,30 +7,34 @@ import ForgeUI, {
   useState, Select, Option, MacroConfig, useConfig, SectionMessage,
 } from '@forge/ui'
 import {
-  buildDiagramUrl,
+  fetchDiagramSVG,
   fetchDocument,
   fetchDocuments,
   fetchProjects,
   MCDocument,
 } from './api'
+import base64 from 'base-64'
 
 type ConfigType = {
   documentID?: string
 }
 
 const App = () => {
-  const config = (useConfig() || {}) as ConfigType;
+  const config = (useConfig() || {}) as ConfigType
   const [document] = useState(async () => {
-    if (!config.documentID) return;
-    return await fetchDocument(config.documentID);
+    if (!config.documentID) return
+    return await fetchDocument(config.documentID)
   })
-  const [diagramUrls] = useState(async () => {
-    return document && await buildDiagramUrl(document);
+  const [imgSrc] = useState(async () => {
+    if (!document) return
+    const str = await fetchDiagramSVG(document)
+    return `data:image/svg+xml;base64,${base64.encode(str)}`
   })
 
-  if (!diagramUrls) {
+  if (!imgSrc) {
     return (
-      <SectionMessage title="You need to configure this macro" appearance="warning">
+      <SectionMessage title="You need to configure this macro"
+                      appearance="warning">
         <Text>
           While editing the page, select the macro, and click on the pencil icon
           to display configuration options.
@@ -42,16 +46,16 @@ const App = () => {
   return (
     <Fragment>
       <Text>{document.title}</Text>
-      <Image src={diagramUrls.png} alt={document.title} />
+      <Image src={imgSrc} alt={document.title}/>
     </Fragment>
-  );
-};
+  )
+}
 
 export const run = render(
   <Macro
-    app={<App />}
-  />
-);
+    app={<App/>}
+  />,
+)
 
 type OptionType = {
   id: string;
@@ -59,32 +63,32 @@ type OptionType = {
 }
 const Config = () => {
   const [options] = useState<OptionType[]>(async () => {
-    const projects = await fetchProjects();
-    const dp = [];
-    projects.map((p) => dp.push(fetchDocuments(p.id)));
-    const docResult: MCDocument[][] = await Promise.all(dp);
-    const result: OptionType[] = [];
+    const projects = await fetchProjects()
+    const dp = []
+    projects.map((p) => dp.push(fetchDocuments(p.id)))
+    const docResult: MCDocument[][] = await Promise.all(dp)
+    const result: OptionType[] = []
     projects.map((p, idx) => {
       (docResult[idx] || []).map((doc) => {
         result.push({
           id: doc.documentID,
-          title: `${p.title}/${doc.title}`
+          title: `${p.title}/${doc.title}`,
         })
-      });
+      })
     })
 
-    return result;
-  });
+    return result
+  })
 
   return (
     <MacroConfig>
       <Select label="Diagram" name="documentID">
         {options.map((p) => (
-          <Option label={p.title} value={p.id} />
+          <Option label={p.title} value={p.id}/>
         ))}
       </Select>
     </MacroConfig>
-  );
-};
+  )
+}
 
-export const config = render(<Config />);
+export const config = render(<Config/>)
