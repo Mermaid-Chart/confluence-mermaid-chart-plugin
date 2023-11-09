@@ -1,5 +1,5 @@
 import { fetch, storage } from '@forge/api'
-import { BASE_URL_KEY, TOKEN_KEY } from './settings'
+import { TOKEN_KEY } from './settings'
 
 export interface MCUser {
   fullName: string;
@@ -18,12 +18,13 @@ export interface MCDocument {
   title: string;
 }
 
+const BASE_URL = 'https://www.mermaidchart.com/';
+
 const request = async (path: string, newToken?: string) => {
-  const [token, baseUrl] = await Promise.all<string>([
+  const [token] = await Promise.all<string>([
     storage.getSecret(TOKEN_KEY),
-    storage.get(BASE_URL_KEY)
   ]);
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(`${BASE_URL}${path}`, {
     headers: {
       Authorization: `Bearer ${newToken || token}`
     }

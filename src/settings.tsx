@@ -9,27 +9,22 @@ import ForgeUI, {
 import { storage } from '@forge/api'
 import { fetchCurrentUser } from './api'
 
-export const BASE_URL_KEY = 'base_url'
 export const TOKEN_KEY = 'token'
 
 type StateType = {
-  baseUrl: string;
   token: string;
 }
 
 const App = () => {
-  const [{ baseUrl, token }, setSettings] = useState<StateType>(async () => {
-    const [baseUrl, token] = await Promise.all<string>([
-      storage.get(BASE_URL_KEY),
-      storage.getSecret(TOKEN_KEY),
-    ])
-    return { baseUrl, token }
+  const [{  token }, setSettings] = useState<StateType>(async () => {
+    const token = await storage.getSecret(TOKEN_KEY);
+    return { token }
   });
   const [tokenError, setTokenError] = useState('');
   const [saved, setSaved] = useState(false);
 
-  const onSubmit = async ({ token, baseUrl }: StateType) => {
-    setSettings({baseUrl, token});
+  const onSubmit = async ({ token }: StateType) => {
+    setSettings({token});
     setTokenError('');
     setSaved(false);
     try {
@@ -39,10 +34,7 @@ const App = () => {
       return;
     }
 
-    await Promise.all([
-      storage.set(BASE_URL_KEY, baseUrl),
-      storage.setSecret(TOKEN_KEY, token),
-    ])
+    await storage.setSecret(TOKEN_KEY, token)
     setSaved(true);
   }
 
@@ -52,8 +44,6 @@ const App = () => {
         <TextField name="token" label="Secret token"
                    defaultValue={token || ''}/>
         {tokenError && <Text>{tokenError}</Text>}
-        <TextField name="baseUrl" label="Base URL"
-                   defaultValue={baseUrl || 'https://www.mermaidchart.com/'}/>
         {saved && <Text>Saved</Text>}
       </Form>
     </Fragment>
