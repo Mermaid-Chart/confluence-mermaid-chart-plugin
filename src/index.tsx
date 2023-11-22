@@ -4,39 +4,65 @@ import ForgeUI, {
   Text,
   Fragment,
   Image,
-  useState, Select, Option, MacroConfig, useConfig, SectionMessage,
+  useState,
+  Select,
+  Option,
+  MacroConfig,
+  useConfig,
+  SectionMessage,
+  TextField,
+  Link,
+  useAction,
+  Button,
+  Heading,
 } from '@forge/ui'
 import {
   fetchDiagramSVG,
   fetchDocument,
   fetchDocuments,
   fetchProjects,
+  isTokenExists,
   MCDocument,
 } from './api'
 import base64 from 'base-64'
+import { ImageProps } from '@forge/ui/out/types/components'
 
 type ConfigType = {
   documentID?: string
+  caption?: string
+  imageSize?: ImageProps['size']
 }
 
 const App = () => {
   const config = (useConfig() || {}) as ConfigType
+  const [isToken] = useState(async () => {
+    return await isTokenExists();
+  });
   const [document] = useState(async () => {
-    if (!config.documentID) return
+    if (!config.documentID || !isToken) return
     return await fetchDocument(config.documentID)
-  })
-  const [imgSrc] = useState(async () => {
+  });
+  const getImageBody = async () => {
     if (!document) return
-    const str = await fetchDiagramSVG(document)
-    return `data:image/svg+xml;base64,${base64.encode(str)}`
-  })
+    return await fetchDiagramSVG(document);
+  }
+  const [imgBody, setImageBody] = useAction(getImageBody, getImageBody)
 
-  if (!imgSrc) {
+  if (!isToken) {
     return (
-      <SectionMessage title="You need to configure this macro"
+      <SectionMessage title="Security token is required"
+                      appearance="warning">
+      <Text>To access Mermaid Chart, you need to setup security token in the settings</Text>
+      </SectionMessage>
+    )
+  }
+
+  if (!imgBody) {
+    return (
+      <SectionMessage title="You need to select a diagram"
                       appearance="warning">
         <Text>
-          While editing the page, select the macro, and click on the pencil icon
+          While editing the page, select this message, and click on the pencil icon
           to display configuration options.
         </Text>
       </SectionMessage>
@@ -45,8 +71,10 @@ const App = () => {
 
   return (
     <Fragment>
-      <Text>{document.title}</Text>
-      <Image src={imgSrc} alt={document.title}/>
+      <Heading size="medium">{config.caption || ''}</Heading>
+      <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Edit diagram</Link></Text>
+      <Image size={config.imageSize} src={`data:image/svg+xml;base64,${base64.encode(imgBody)}`} alt={document.title}/>
+      <Button text="Update" onClick={() => setImageBody()} />
     </Fragment>
   )
 }
@@ -63,6 +91,8 @@ type OptionType = {
 }
 const Config = () => {
   const [options] = useState<OptionType[]>(async () => {
+    const isToken = await isTokenExists();
+    if (!isToken) return [];
     const projects = await fetchProjects()
     const dp = []
     projects.map((p) => dp.push(fetchDocuments(p.id)))
@@ -78,13 +108,21 @@ const Config = () => {
     })
 
     return result
-  })
+  });
+
+  const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
   return (
     <MacroConfig>
       <Select label="Diagram" name="documentID">
         {options.map((p) => (
           <Option label={p.title} value={p.id}/>
+        ))}
+      </Select>
+      <TextField name="caption" label="Caption" />
+      <Select label="Image size" name="imageSize">
+        {imageSizes.map((s) => (
+          <Option label={s} value={s}/>
         ))}
       </Select>
     </MacroConfig>
