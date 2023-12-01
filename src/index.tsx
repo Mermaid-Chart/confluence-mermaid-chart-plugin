@@ -62,8 +62,7 @@ const App = () => {
       <SectionMessage title="You need to select a diagram"
                       appearance="warning">
         <Text>
-          While editing the page, select this message, and click on the pencil icon
-          to display configuration options.
+          Click on pencil icon to select diagram
         </Text>
       </SectionMessage>
     )
@@ -71,9 +70,9 @@ const App = () => {
 
   return (
     <Fragment>
-      <Heading size="medium">{config.caption || ''}</Heading>
       <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Edit diagram</Link></Text>
       <Image size={config.imageSize} src={`data:image/svg+xml;base64,${base64.encode(imgBody)}`} alt={document.title}/>
+      <Text>{config.caption || ''}</Text>
       <Button text="Update" onClick={() => setImageBody()} />
     </Fragment>
   )
