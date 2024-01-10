@@ -59,12 +59,17 @@ const App = () => {
 
   if (!imgBody) {
     return (
-      <SectionMessage title="You need to select a diagram"
-                      appearance="warning">
-        <Text>
-          Click on pencil icon to select diagram
-        </Text>
-      </SectionMessage>
+      // <SectionMessage title="You need to select a diagram"
+      //                 appearance="warning">
+      //   <Text>
+      //     Click on pencil icon to select diagram
+      //   </Text>
+      // </SectionMessage>
+      <Fragment>
+        <Text>Select an existing diagram or create a new</Text>
+        <Text><Link appearance="button" openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Select diagram</Link></Text>
+        <Button text="Create new diagram" onClick={() => setImageBody()} />
+    </Fragment>
     )
   }
 
