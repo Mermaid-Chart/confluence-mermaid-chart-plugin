@@ -59,24 +59,22 @@ const App = () => {
   }
 
   const getDocument = async () => {
-    console.log('getDocument called:', config.documentID);
+    console.log('getDocument called:', diagramDocumentID);
     console.log('getDocument called:', isToken);
-    if (!config.documentID || !isToken) return
-    return await fetchDocument(config.documentID)
+    if (!diagramDocumentID || !isToken) return
+    return await fetchDocument(diagramDocumentID)
   }
 
+  // Holding digram data. To be removed later on
+  const [diagramDocumentID, setDiagramDocumentID] = useState('');
+  const [diagramCaption, setDiagramCaption] = useState('');
+  const [diagramImageSize, setDiagramImageSize] = useState('medium');
   const [document, setDocument] = useAction(getDocument, getDocument);
   const [imgBody, setImageBody] = useAction(getImageBody, getImageBody)
 
   // Diagram selection dialog state
   const [isOpen, setOpen] = useState(false);
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
-
-  // Holdind digram data. To be removed later on
-  const [diagramDocumentID, setDiagramDocumentID] = useState('');
-  const [diagramCaption, setDiagramCaption] = useState('');
-  const [diagramImageSize, setDiagramImageSize] = useState('medium');
-
 
   if (!isToken) {
     return (
@@ -110,6 +108,8 @@ const App = () => {
             config.documentID = data.documentID;
             config.imageSize = data.imageSize;
             storeDiagram(data.documentID, data.caption, data.imageSize);
+            setDocument();
+            setImageBody();
 
 
         }}
