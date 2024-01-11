@@ -85,7 +85,6 @@ const App = () => {
     )
   }
 
-
   // TODO: Remove to separate file in StorageUtils later on
   const storeDiagram = (documentID: string, caption: string, imageSize: ImageProps['size'])  => {
     console.log('storeDiagram called');
@@ -137,58 +136,29 @@ const App = () => {
     );
   }
 
-
-  // const [options] = useState<OptionType[]>(async () => {
-  //   const isToken = await isTokenExists();
-  //   if (!isToken) return [];
-  //   const projects = await fetchProjects()
-  //   const dp = []
-  //   projects.map((p) => dp.push(fetchDocuments(p.id)))
-  //   const docResult: MCDocument[][] = await Promise.all(dp)
-  //   const result: OptionType[] = []
-  //   projects.map((p, idx) => {
-  //     (docResult[idx] || []).map((doc) => {
-  //       result.push({
-  //         id: doc.documentID,
-  //         title: `${p.title}/${doc.title}`,
-  //       })
-  //     })
-  //   })
-
-  //   return result
-  // });
-
-
-  //const Config = () => {
-    const [options] = useState<OptionType[]>(async () => {
-      const isToken = await isTokenExists();
-      if (!isToken) return [];
-      const projects = await fetchProjects()
-      const dp = []
-      projects.map((p) => dp.push(fetchDocuments(p.id)))
-      const docResult: MCDocument[][] = await Promise.all(dp)
-      const result: OptionType[] = []
-      projects.map((p, idx) => {
-        (docResult[idx] || []).map((doc) => {
-          result.push({
-            id: doc.documentID,
-            title: `${p.title}/${doc.title}`,
-          })
+  const [options] = useState<OptionType[]>(async () => {
+    const isToken = await isTokenExists();
+    if (!isToken) return [];
+    const projects = await fetchProjects()
+    const dp = []
+    projects.map((p) => dp.push(fetchDocuments(p.id)))
+    const docResult: MCDocument[][] = await Promise.all(dp)
+    const result: OptionType[] = []
+    projects.map((p, idx) => {
+      (docResult[idx] || []).map((doc) => {
+        result.push({
+          id: doc.documentID,
+          title: `${p.title}/${doc.title}`,
         })
       })
+    })
 
-      return result
-    });
-  //}
+    return result
+  });
+
 
   if (!imgBody) {
     return (
-      // <SectionMessage title="You need to select a diagram"
-      //                 appearance="warning">
-      //   <Text>
-      //     Click on pencil icon to select diagram
-      //   </Text>
-      // </SectionMessage>
       <Fragment>
         <Text>Select an existing diagram or create a new</Text>
         {/* <Text><Link appearance="button" openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Select diagram</Link></Text> */}
@@ -196,17 +166,14 @@ const App = () => {
         <Button text="Create new diagram" onClick={() => setImageBody()} />
 
         {/* The user selects a diagram from the list of diagrams in the project. */}
-        { isOpen ? selectProjectAndName() : dummyFunc() }
-
-
-
+        { isOpen && selectProjectAndName()}
       </Fragment>
     )
   }
 
   return (
     <Fragment>
-      <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Edit diagram</Link></Text>
+      <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${diagramDocumentID}?ref=vscode`}>Edit diagram</Link></Text>
       <Image size={config.imageSize} src={`data:image/svg+xml;base64,${base64.encode(imgBody)}`} alt={document.title}/>
       <Text>{config.caption || ''}</Text>
       <Button text="Update" onClick={() => setImageBody()} />
@@ -220,48 +187,4 @@ export const run = render(
   />,
 )
 
-// type OptionType = {
-//   id: string;
-//   title: string;
-// }
-// const Config = () => {
-//   const [options] = useState<OptionType[]>(async () => {
-//     const isToken = await isTokenExists();
-//     if (!isToken) return [];
-//     const projects = await fetchProjects()
-//     const dp = []
-//     projects.map((p) => dp.push(fetchDocuments(p.id)))
-//     const docResult: MCDocument[][] = await Promise.all(dp)
-//     const result: OptionType[] = []
-//     projects.map((p, idx) => {
-//       (docResult[idx] || []).map((doc) => {
-//         result.push({
-//           id: doc.documentID,
-//           title: `${p.title}/${doc.title}`,
-//         })
-//       })
-//     })
 
-//     return result
-//   });
-
-//   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
-
-//   return (
-//     <MacroConfig>
-//       <Select label="Diagram" name="documentID">
-//         {options.map((p) => (
-//           <Option label={p.title} value={p.id}/>
-//         ))}
-//       </Select>
-//       <TextField name="caption" label="Caption" />
-//       <Select label="Image size" name="imageSize">
-//         {imageSizes.map((s) => (
-//           <Option label={s} value={s}/>
-//         ))}
-//       </Select>
-//     </MacroConfig>
-//   )
-// }
-
-//export const config = render(<Config/>)
