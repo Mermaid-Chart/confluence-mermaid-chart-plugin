@@ -24,10 +24,11 @@ import {
   fetchDocuments,
   fetchProjects,
   isTokenExists,
-  MCDocument,
+  createDocument,
 } from './api'
 import base64 from 'base-64'
 import { ImageProps } from '@forge/ui/out/types/components'
+import { MCDocument } from './api';
 
 type ConfigType = {
   documentID?: string
@@ -62,6 +63,9 @@ const App = () => {
     return await fetchDocument(diagramDocumentID)
   }
 
+  const diagramInitValue:MCDocument = {} as MCDocument;
+
+
   // Holding digram data. To be removed later on
   const [diagramDocumentID, setDiagramDocumentID] = useState('');
   const [diagramCaption, setDiagramCaption] = useState('');
@@ -73,6 +77,13 @@ const App = () => {
   const [isOpen, setOpen] = useState(false);
   const [isNewDiagramOpen, setNewDiagOpen] = useState(false);
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
+  const [projectID, setProjectID] = useState('');
+  // const [newDiagramID, setNewDiagram] = useState(async () => {
+  //   return createDocument(projectID);
+  // });
+  const [newDiagramID, setNewDiagram] = useAction(async () => {
+      return createDocument(projectID);
+     },diagramInitValue);
 
   if (!isToken) {
     return (
@@ -92,28 +103,24 @@ const App = () => {
   }
 
   // TODO: Remove to separate file in StorageUtils later on
-  const createNewDiagram = () => {
+  const createNewDiagram =  () => {
     console.log('createNewDiagram called');
     return (
       <ModalDialog header="Select Project and Name of new diagram" onClose={() => setOpen(false)}>
       <Form
-        onSubmit={data => {
+        onSubmit =  {data => {
           console.log('Data set from dialog:', data);
           setNewDiagOpen(false);
-          config.documentID = data.documentID;
-          config.imageSize = data.imageSize;
-          storeDiagram(data.documentID, data.caption, data.imageSize);
-          setDocument();
-          setImageBody();
-
-
+          setProjectID(data.projectID);
+          setNewDiagram();
+          console.log('New document ID:', newDiagramID.documentID);
+          console.log('New document ID:', newDiagramID.projectID);
         }}
       >
-      <Select label="Project" name="documentID">
+      <Select label="Project" name="projectID">
         {projects.map((p) => (
         <Option label={p} value={p}/>
         ))}
-
       </Select>
 
 
@@ -158,12 +165,6 @@ const App = () => {
     );
   }
 
-  const dummyFunc = () => {
-    return (
-      <Text>dummy</Text>
-    );
-  }
-
   const [options] = useState<OptionType[]>(async () => {
     const isToken = await isTokenExists();
     if (!isToken) return [];
@@ -188,7 +189,6 @@ const App = () => {
     const isToken = await isTokenExists();
     if (!isToken) return [];
     const availableProjects = await fetchProjects();
-    console.log('availableProjects:', availableProjects);
     return availableProjects.map((p) => p.title);
   });
 
