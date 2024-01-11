@@ -15,6 +15,8 @@ import ForgeUI, {
   useAction,
   Button,
   Heading,
+  ModalDialog,
+  Form,
 } from '@forge/ui'
 import {
   fetchDiagramSVG,
@@ -33,20 +35,48 @@ type ConfigType = {
   imageSize?: ImageProps['size']
 }
 
+type OptionType = {
+  id: string;
+  title: string;
+}
+
 const App = () => {
   const config = (useConfig() || {}) as ConfigType
+
   const [isToken] = useState(async () => {
     return await isTokenExists();
   });
-  const [document] = useState(async () => {
-    if (!config.documentID || !isToken) return
-    return await fetchDocument(config.documentID)
-  });
+
+  // const [document] = useState(async () => {
+  //   if (!config.documentID || !isToken) return
+  //   return await fetchDocument(config.documentID)
+  // });
+
   const getImageBody = async () => {
+    console.log('getImageBody called:', document);
     if (!document) return
     return await fetchDiagramSVG(document);
   }
+
+  const getDocument = async () => {
+    console.log('getDocument called:', config.documentID);
+    console.log('getDocument called:', isToken);
+    if (!config.documentID || !isToken) return
+    return await fetchDocument(config.documentID)
+  }
+
+  const [document, setDocument] = useAction(getDocument, getDocument);
   const [imgBody, setImageBody] = useAction(getImageBody, getImageBody)
+
+  // Diagram selection dialog state
+  const [isOpen, setOpen] = useState(false);
+  const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
+
+  // Holdind digram data. To be removed later on
+  const [diagramDocumentID, setDiagramDocumentID] = useState('');
+  const [diagramCaption, setDiagramCaption] = useState('');
+  const [diagramImageSize, setDiagramImageSize] = useState('medium');
+
 
   if (!isToken) {
     return (
@@ -56,6 +86,100 @@ const App = () => {
       </SectionMessage>
     )
   }
+
+
+  // TODO: Remove to separate file in StorageUtils later on
+  const storeDiagram = (documentID: string, caption: string, imageSize: ImageProps['size'])  => {
+    console.log('storeDiagram called');
+    setDiagramDocumentID(documentID);
+    setDiagramCaption(caption);
+    setDiagramImageSize(imageSize);
+  }
+
+
+  // TODO: Move to separate file later on
+  const selectProjectAndName = () => {
+    console.log('selectProjectAndName called');
+    return (
+      <ModalDialog header="Mermaid Chart Diagram" onClose={() => setOpen(false)}>
+      <Form
+        onSubmit={data => {
+          console.log('Data set from dialog:', data);
+           setOpen(false);
+
+            config.documentID = data.documentID;
+            config.imageSize = data.imageSize;
+            storeDiagram(data.documentID, data.caption, data.imageSize);
+
+
+        }}
+      >
+      <Select label="Diagram" name="documentID">
+        {options.map((p) => (
+        <Option label={p.title} value={p.id}/>
+        ))}
+      </Select>
+      <TextField name="caption" label="Caption" />
+      <Select label="Image size" name="imageSize">
+        {imageSizes.map((s) => (
+        <Option label={s} value={s}/>
+        ))}
+      </Select>
+
+      </Form>
+    </ModalDialog>
+    );
+  }
+
+  const dummyFunc = () => {
+    return (
+      <Text>dummy</Text>
+    );
+  }
+
+
+  // const [options] = useState<OptionType[]>(async () => {
+  //   const isToken = await isTokenExists();
+  //   if (!isToken) return [];
+  //   const projects = await fetchProjects()
+  //   const dp = []
+  //   projects.map((p) => dp.push(fetchDocuments(p.id)))
+  //   const docResult: MCDocument[][] = await Promise.all(dp)
+  //   const result: OptionType[] = []
+  //   projects.map((p, idx) => {
+  //     (docResult[idx] || []).map((doc) => {
+  //       result.push({
+  //         id: doc.documentID,
+  //         title: `${p.title}/${doc.title}`,
+  //       })
+  //     })
+  //   })
+
+  //   return result
+  // });
+
+
+  //const Config = () => {
+    const [options] = useState<OptionType[]>(async () => {
+      const isToken = await isTokenExists();
+      if (!isToken) return [];
+      const projects = await fetchProjects()
+      const dp = []
+      projects.map((p) => dp.push(fetchDocuments(p.id)))
+      const docResult: MCDocument[][] = await Promise.all(dp)
+      const result: OptionType[] = []
+      projects.map((p, idx) => {
+        (docResult[idx] || []).map((doc) => {
+          result.push({
+            id: doc.documentID,
+            title: `${p.title}/${doc.title}`,
+          })
+        })
+      })
+
+      return result
+    });
+  //}
 
   if (!imgBody) {
     return (
@@ -67,9 +191,16 @@ const App = () => {
       // </SectionMessage>
       <Fragment>
         <Text>Select an existing diagram or create a new</Text>
-        <Text><Link appearance="button" openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Select diagram</Link></Text>
+        {/* <Text><Link appearance="button" openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Select diagram</Link></Text> */}
+        <Button text="Select diagram" onClick={() => setOpen(true)} />
         <Button text="Create new diagram" onClick={() => setImageBody()} />
-    </Fragment>
+
+        {/* The user selects a diagram from the list of diagrams in the project. */}
+        { isOpen ? selectProjectAndName() : dummyFunc() }
+
+
+
+      </Fragment>
     )
   }
 
@@ -89,48 +220,48 @@ export const run = render(
   />,
 )
 
-type OptionType = {
-  id: string;
-  title: string;
-}
-const Config = () => {
-  const [options] = useState<OptionType[]>(async () => {
-    const isToken = await isTokenExists();
-    if (!isToken) return [];
-    const projects = await fetchProjects()
-    const dp = []
-    projects.map((p) => dp.push(fetchDocuments(p.id)))
-    const docResult: MCDocument[][] = await Promise.all(dp)
-    const result: OptionType[] = []
-    projects.map((p, idx) => {
-      (docResult[idx] || []).map((doc) => {
-        result.push({
-          id: doc.documentID,
-          title: `${p.title}/${doc.title}`,
-        })
-      })
-    })
+// type OptionType = {
+//   id: string;
+//   title: string;
+// }
+// const Config = () => {
+//   const [options] = useState<OptionType[]>(async () => {
+//     const isToken = await isTokenExists();
+//     if (!isToken) return [];
+//     const projects = await fetchProjects()
+//     const dp = []
+//     projects.map((p) => dp.push(fetchDocuments(p.id)))
+//     const docResult: MCDocument[][] = await Promise.all(dp)
+//     const result: OptionType[] = []
+//     projects.map((p, idx) => {
+//       (docResult[idx] || []).map((doc) => {
+//         result.push({
+//           id: doc.documentID,
+//           title: `${p.title}/${doc.title}`,
+//         })
+//       })
+//     })
 
-    return result
-  });
+//     return result
+//   });
 
-  const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
+//   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
-  return (
-    <MacroConfig>
-      <Select label="Diagram" name="documentID">
-        {options.map((p) => (
-          <Option label={p.title} value={p.id}/>
-        ))}
-      </Select>
-      <TextField name="caption" label="Caption" />
-      <Select label="Image size" name="imageSize">
-        {imageSizes.map((s) => (
-          <Option label={s} value={s}/>
-        ))}
-      </Select>
-    </MacroConfig>
-  )
-}
+//   return (
+//     <MacroConfig>
+//       <Select label="Diagram" name="documentID">
+//         {options.map((p) => (
+//           <Option label={p.title} value={p.id}/>
+//         ))}
+//       </Select>
+//       <TextField name="caption" label="Caption" />
+//       <Select label="Image size" name="imageSize">
+//         {imageSizes.map((s) => (
+//           <Option label={s} value={s}/>
+//         ))}
+//       </Select>
+//     </MacroConfig>
+//   )
+// }
 
-export const config = render(<Config/>)
+//export const config = render(<Config/>)
