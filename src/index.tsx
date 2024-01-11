@@ -47,10 +47,7 @@ const App = () => {
     return await isTokenExists();
   });
 
-  // const [document] = useState(async () => {
-  //   if (!config.documentID || !isToken) return
-  //   return await fetchDocument(config.documentID)
-  // });
+
 
   const getImageBody = async () => {
     console.log('getImageBody called:', document);
@@ -74,6 +71,7 @@ const App = () => {
 
   // Diagram selection dialog state
   const [isOpen, setOpen] = useState(false);
+  const [isNewDiagramOpen, setNewDiagOpen] = useState(false);
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
   if (!isToken) {
@@ -93,24 +91,54 @@ const App = () => {
     setDiagramImageSize(imageSize);
   }
 
+  // TODO: Remove to separate file in StorageUtils later on
+  const createNewDiagram = () => {
+    console.log('createNewDiagram called');
+    return (
+      <ModalDialog header="Select Project and Name of new diagram" onClose={() => setOpen(false)}>
+      <Form
+        onSubmit={data => {
+          console.log('Data set from dialog:', data);
+          setNewDiagOpen(false);
+          config.documentID = data.documentID;
+          config.imageSize = data.imageSize;
+          storeDiagram(data.documentID, data.caption, data.imageSize);
+          setDocument();
+          setImageBody();
+
+
+        }}
+      >
+      <Select label="Project" name="documentID">
+        {projects.map((p) => (
+        <Option label={p} value={p}/>
+        ))}
+
+      </Select>
+
+
+
+      </Form>
+    </ModalDialog>
+    );
+
+  }
 
   // TODO: Move to separate file later on
   const selectProjectAndName = () => {
     console.log('selectProjectAndName called');
     return (
-      <ModalDialog header="Mermaid Chart Diagram" onClose={() => setOpen(false)}>
+      <ModalDialog header="Select Mermaid Chart Diagram" onClose={() => setOpen(false)}>
       <Form
         onSubmit={data => {
           console.log('Data set from dialog:', data);
-           setOpen(false);
+          setOpen(false);
 
-            config.documentID = data.documentID;
-            config.imageSize = data.imageSize;
-            storeDiagram(data.documentID, data.caption, data.imageSize);
-            setDocument();
-            setImageBody();
-
-
+          config.documentID = data.documentID;
+          config.imageSize = data.imageSize;
+          storeDiagram(data.documentID, data.caption, data.imageSize);
+          setDocument();
+          setImageBody();
         }}
       >
       <Select label="Diagram" name="documentID">
@@ -156,6 +184,13 @@ const App = () => {
     return result
   });
 
+  const [projects] = useState<string[]>(async () => {
+    const isToken = await isTokenExists();
+    if (!isToken) return [];
+    const availableProjects = await fetchProjects();
+    console.log('availableProjects:', availableProjects);
+    return availableProjects.map((p) => p.title);
+  });
 
   if (!imgBody) {
     return (
@@ -163,10 +198,11 @@ const App = () => {
         <Text>Select an existing diagram or create a new</Text>
         {/* <Text><Link appearance="button" openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Select diagram</Link></Text> */}
         <Button text="Select diagram" onClick={() => setOpen(true)} />
-        <Button text="Create new diagram" onClick={() => setImageBody()} />
+        <Button text="Create new diagram" onClick={() => setNewDiagOpen(true)} />
 
         {/* The user selects a diagram from the list of diagrams in the project. */}
         { isOpen && selectProjectAndName()}
+        { isNewDiagramOpen && createNewDiagram()}
       </Fragment>
     )
   }
