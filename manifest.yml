@@ -17,34 +17,30 @@ modules:
       title: EPA
   macro:
     - key: mermaid
-      title: Mermaid chart
+      title: Mermaid chart X
       description: Mermaid charts
       resource: main
       resolver:
         function: resolver
       render: native
-  # macro:
-  #   - key: mermaid
-  #     # function: main
-  #     function: resolver
-  #     # config:
-  #     #   function: config-function-key
+      # config:
+      #   function: config-function-key
 
-  # confluence:globalSettings:
-  #   - key: mchart-settings
-  #     function: main-settings
-  #     title: Mermaid Chart Settings
+  confluence:globalSettings:
+    - key: mchart-settings
+      function: main-settings
+      title: Mermaid Chart Settings
 
   function:
     - key: resolver
       handler: index.handler
+    # - key: config-function-key
+    #   handler: index.config
 
-  #   # - key: main
-  #   #   handler: index.run
-  #   # - key: config-function-key
-  #   #   handler: index.config
-  #   - key: main-settings
-  #     handler: settings.run
+    #   # - key: main
+    #   #   handler: index.run
+    - key: main-settings
+      handler: settings.run
 
 resources:
   - key: main
