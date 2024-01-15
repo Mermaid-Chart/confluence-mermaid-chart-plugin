@@ -1,0 +1,16 @@
+modules:
+  confluence:contentAction:
+    - key: epa-hello-world-content-action
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: EPA
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  id: ari:cloud:ecosystem::app/880e446a-d826-4cae-baeb-310d4c42616a

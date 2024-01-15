@@ -8,23 +8,47 @@ permissions:
   scopes:
     - storage:app
 modules:
+  confluence:contentAction:
+    - key: epa-hello-world-content-action
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: EPA
   macro:
     - key: mermaid
-      function: main
       title: Mermaid chart
       description: Mermaid charts
-      config:
-        function: config-function-key
-  confluence:globalSettings:
-    - key: mchart-settings
-      function: main-settings
-      title: Mermaid Chart Settings
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+  # macro:
+  #   - key: mermaid
+  #     # function: main
+  #     function: resolver
+  #     # config:
+  #     #   function: config-function-key
+
+  # confluence:globalSettings:
+  #   - key: mchart-settings
+  #     function: main-settings
+  #     title: Mermaid Chart Settings
+
   function:
-    - key: main
-      handler: index.run
-    - key: config-function-key
-      handler: index.config
-    - key: main-settings
-      handler: settings.run
+    - key: resolver
+      handler: index.handler
+
+  #   # - key: main
+  #   #   handler: index.run
+  #   # - key: config-function-key
+  #   #   handler: index.config
+  #   - key: main-settings
+  #     handler: settings.run
+
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+
 app:
-  id: ari:cloud:ecosystem::app/a97a7610-c98d-4760-9f05-bc21cfc3ddda
+  id: ari:cloud:ecosystem::app/880e446a-d826-4cae-baeb-310d4c42616a
