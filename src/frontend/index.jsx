@@ -1,7 +1,9 @@
+import "../buffer-poly";
 import React, { useEffect, useState } from "react";
 import ForgeReconciler, { Text } from "@forge/react";
 import { invoke } from "@forge/bridge";
-import { ImageProps } from "@forge/ui/out/types/components";
+import ForgeUI, { render, MacroConfig, TextField } from "@forge/ui";
+
 
 // type ConfigType = {
 //   documentID?: string;
@@ -21,8 +23,11 @@ const App = () => {
 
   return (
     <>
-      <Text>Hello world!</Text>
+      <Text>Hello world(ui-kit-2)!</Text>
       <Text>{data ? data : "Loading..."}</Text>
+      <Text>
+        Config: {productContext?.extension?.config?.age}
+      </Text>
     </>
   );
 };
@@ -32,3 +37,21 @@ ForgeReconciler.render(
     <App />
   </React.StrictMode>
 );
+
+ForgeReconciler.addConfig(<Config />);
+
+const defaultConfig = {
+  name: "Unnamed Pet",
+  age: "0"
+};
+
+const Config = () => {
+  return (
+    <MacroConfig>
+      <TextField name="name" label="Pet name" defaultValue={defaultConfig.name} />
+      <TextField name="age" label="Pet age" defaultValue={defaultConfig.age} />
+    </MacroConfig>
+  );
+};
+
+export const config = render(<Config />);
