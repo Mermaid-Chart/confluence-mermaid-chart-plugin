@@ -46,14 +46,14 @@ import {
   // Row,
   // Cell,
 } from "@forge/ui";
-import {
-  fetchDiagramSVG,
-  fetchDocument,
-  fetchDocuments,
-  fetchProjects,
-  isTokenExists,
-  MCDocument,
-} from "./api";
+// import {
+//   fetchDiagramSVG,
+//   fetchDocument,
+//   fetchDocuments,
+//   fetchProjects,
+//   isTokenExists,
+//   MCDocument,
+// } from "./api";
 import base64 from "base-64";
 import { ImageProps } from "@forge/ui/out/types/components";
 
