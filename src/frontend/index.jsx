@@ -11,7 +11,7 @@ import { ImageProps } from "@forge/ui/out/types/components";
 
 const App = () => {
   // const config = (useConfig() || {}) as ConfigType;
-  // const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
   const [productContext, setProductContext] = useState({});
   // const config = productContext?.extension?.config || ({} as ConfigType);
 
@@ -22,7 +22,7 @@ const App = () => {
   return (
     <>
       <Text>Hello world!</Text>
-      {/* <Text>{data ? data : "Loading..."}</Text> */}
+      <Text>{data ? data : "Loading..."}</Text>
     </>
   );
 };
