@@ -8,13 +8,13 @@ permissions:
   scopes:
     - storage:app
 modules:
-  confluence:contentAction:
-    - key: epa-hello-world-content-action
-      resource: main
-      resolver:
-        function: resolver
-      render: native
-      title: EPA
+  # confluence:contentAction:
+  #   - key: epa-hello-world-content-action
+  #     resource: main
+  #     resolver:
+  #       function: resolver
+  #     render: native
+  #     title: EPA
   macro:
     - key: mermaid
       title: Mermaid chart X
@@ -23,8 +23,7 @@ modules:
       resolver:
         function: resolver
       render: native
-      # config:
-      #   function: config-function-key
+      config: true
 
   confluence:globalSettings:
     - key: mchart-settings
@@ -47,4 +46,5 @@ resources:
     path: src/frontend/index.jsx
 
 app:
-  id: ari:cloud:ecosystem::app/880e446a-d826-4cae-baeb-310d4c42616a
+  id: ari:cloud:ecosystem::app/a36ca994-14b4-48d0-8970-e4515eae559f
+  name: mc-ui-kit2
