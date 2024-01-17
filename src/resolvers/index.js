@@ -1,11 +1,19 @@
-import Resolver from '@forge/resolver';
-
+import Resolver from "@forge/resolver";
+import {
+  fetchDiagramSVG,
+  fetchDocument,
+  fetchDocuments,
+  fetchProjects,
+  isTokenExists,
+  MCDocument,
+} from "../api";
 const resolver = new Resolver();
 
-resolver.define('getText', (req) => {
+resolver.define("getText", async (req) => {
   console.log(req);
-
-  return 'Hello, world!';
+  const projects = await fetchProjects();
+  console.log("Projects: ", projects);
+  return "Hello, world!!" + projects.length;
 });
 
 export const handler = resolver.getDefinitions();
