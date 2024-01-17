@@ -28,7 +28,7 @@ modules:
   confluence:globalSettings:
     - key: mchart-settings
       function: main-settings
-      title: Mermaid Chart Settings
+      title: Mermaid Chart Settings (UI Kit 2)
 
   function:
     - key: resolver
