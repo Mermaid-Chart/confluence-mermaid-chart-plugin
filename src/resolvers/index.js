@@ -12,8 +12,15 @@ const resolver = new Resolver();
 resolver.define("getText", async (req) => {
   console.log(req);
   const projects = await fetchProjects();
-  console.log("Projects: ", projects);
+  // console.log("Projects: ", projects);
   return "Hello, world!!" + projects.length;
+});
+
+resolver.define("getProjects", async (req) => {
+  console.log(req);
+  const projects = await fetchProjects();
+  console.log("Projects: ", projects);
+  return projects;
 });
 
 export const handler = resolver.getDefinitions();

@@ -19,6 +19,7 @@ const App = () => {
 
   useEffect(() => {
     invoke("getText", { example: "my-invoke-variable" }).then(setData);
+    // invoke("getText", { example: "my-invoke-variable" }).then(setData);
   }, []);
 
   return (
