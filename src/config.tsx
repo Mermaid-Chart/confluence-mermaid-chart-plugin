@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { invoke } from "@forge/bridge";
-import { TextField, Select, Option } from "@forge/react";
+import { TextField, Select, Option, Text } from "@forge/react";
 import { ImageProps } from '@forge/ui/out/types/components'
 import { MCDocument, MCProject } from './api';
 const defaultConfig = {
@@ -20,27 +20,43 @@ type OptionType = {
 
 
 export const Config = () => {
-  const [isToken, setToken] = useState(false);
-  const [projects, setProjects] = useState<MCProject[]>([]);
-  const [documents, setDocuments] = useState<MCDocument[]>([]);
+  const [isToken, setToken] = useState(null);
+  //const [projects, setProjects] = useState<MCProject[]>([]);
+  //const [documents, setDocuments] = useState<MCDocument[]>([]);
+  const [projects, setProjects] = useState([]);
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    invoke("getTokenExist", {}).then(setToken);
+    invoke("getProjects", {}).then(setProjects);
+    //invoke("getDocuments", {}).then(setDocuments);
+    const payload = { projectID: 'apa'}
+    const docs =  invoke("getDocuments", {payload, test:'per'})
+  }, []);
+
 
 
 const [options] = useState<OptionType[]>( () => {
   //const isToken = await isTokenExists();
-  useEffect(() => {
-    invoke("isTokenExist", {}).then(setToken);
-  }, []);
+  // useEffect(() => {
+  //   invoke("isTokenExist", {}).then(setToken);
+  // }, []);
 
 
-  // if (!isToken) return [];
+  if (!isToken) return [];
   // //const projects = await fetchProjects()
   // useEffect(() => {
   //   invoke("getProjects", {}).then(setProjects);
   // }, []);
-  // const dp = []
+  const dp = []
 
   //projects.map((p) => dp.push(fetchDocuments(p.id)))
 
+  projects.forEach((p) => {
+    const payload = { projectID: 'apa'}
+    const docs =  invoke("getDocuments", {payload, test:'per'})
+    dp.push(docs)
+  })
   // projects.map((p) => {
   //   useEffect(() => {
   //     invoke("getDocuments", {payload: p.id}).then(setDocuments);
@@ -48,10 +64,18 @@ const [options] = useState<OptionType[]>( () => {
   //   dp.push(documents);
   // })
 
-  //const docResult: MCDocument[][] = await Promise.all(dp)
+  const docResult: MCDocument[][] = dp;
 
 
   const result: OptionType[] = [];
+  projects.map((p, idx) => {
+    (docResult[idx] || []).map((doc) => {
+      result.push({
+        id: doc.documentID,
+        title: `${p.title}/${doc.title}`,
+      })
+    })
+  })
   return result
 });
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
@@ -70,6 +94,23 @@ const [options] = useState<OptionType[]>( () => {
         ))}
       </Select>
 
+      <TextField
+        name="Token"
+        label="Token"
+        defaultValue={isToken}
+      />
+
+      <TextField
+        name="Projects"
+        label="Projects"
+        defaultValue={projects ? projects.length : -1}
+      />
+
+      <TextField
+        name="Documents"
+        label="Documents"
+        defaultValue={documents ? documents.length : -1}
+      />
 
     </>
   );

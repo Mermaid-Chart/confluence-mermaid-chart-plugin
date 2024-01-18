@@ -33,24 +33,26 @@ resolver.define("getDocument", async (req) => {
 });
 
 resolver.define("getDocuments", async (req) => {
-  console.log(req);
-  const projectID = req.payload.projectID;
-  const documents = await fetchDocuments(projectID);
-  //console.log("documents: ", documents);
-  return documents;
+  console.log("getDocuments called");
+  console.log("req:", req);
+  // const projectID = req.payload.projectID;
+  // const documents = await fetchDocuments(projectID);
+
+  // return documents;
+  return { larsa: "cool" };
 });
 
 resolver.define("getProjects", async (req) => {
-  console.log(req);
+  console.log("getProjects called");
   const projects = await fetchProjects();
   //console.log("Projects: ", projects);
   return projects;
 });
 
 resolver.define("getTokenExist", async (req) => {
-  console.log(req);
+  console.log("getTokenExist called");
   const tokenExist = await isTokenExists();
-  //console.log("tokenExist: ", tokenExist);
+  console.log("tokenExist: ", tokenExist);
   return tokenExist;
 });
 
