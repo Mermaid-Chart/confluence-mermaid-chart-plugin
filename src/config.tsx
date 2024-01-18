@@ -41,28 +41,29 @@ const [options] = useState<OptionType[]>( () => {
   if (isToken === 'false') {
     return [];
   }
-
-  const localProjects = new Array<MCProject>();
-  const dp = [];
   const result: OptionType[] = [];
-  const docResult: MCDocument[][] = [];
+
+
+
   // Fetch all projects
   invoke("getProjects", {}).then(tempProjects => {
-    console.log('Projects:', tempProjects);
+    const dp = [];
+
 
     (tempProjects as MCProject[]).map((p) => {
-      //localProjects.push(p);
+
       invoke("getDocuments", {projectID: p.id}).then(tempDocuments => {
-        console.log('Documents:', tempDocuments);
         dp.push(tempDocuments);
       })
     })
 
     const docResult: MCDocument[][] = dp;
+
     console.log('docResult', docResult);
     console.log('tempProjects', tempProjects);
     (tempProjects as MCProject[]).map((p, idx) => {
       (docResult[idx] || []).map((doc) => {
+        console.log('pushing to result', doc);
         result.push({
           id: doc.documentID,
           title: `${p.title}/${doc.title}`,
@@ -73,9 +74,7 @@ const [options] = useState<OptionType[]>( () => {
     return result;
   })
 
-  console.log('docResult.length', docResult.length);
-  console.log('docResult', docResult);
-  console.log('localProjects', localProjects);
+
 
 
 
@@ -93,7 +92,7 @@ const [options] = useState<OptionType[]>( () => {
   //   })
   // })
 
-  console.log('result', result);
+
 
   return result
 });
