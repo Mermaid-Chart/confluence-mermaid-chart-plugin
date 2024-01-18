@@ -21,20 +21,13 @@ type OptionType = {
 
 export const Config = () => {
   const [isToken, setToken] = useState(null);
-  //const [projects, setProjects] = useState<MCProject[]>([]);
-  //const [documents, setDocuments] = useState<MCDocument[]>([]);
   const [projects, setProjects] = useState([]);
   const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
     invoke("getTokenExist", {}).then(setToken);
     invoke("getProjects", {}).then(setProjects);
-
-    //const payload = { projectID: 'apa'}
-    //const docs =  invoke("getDocuments",  { projectID: 'apa'})
   }, []);
-
-
 
 const [options] = useState<OptionType[]>( () => {
 
@@ -42,8 +35,6 @@ const [options] = useState<OptionType[]>( () => {
     return [];
   }
   const result: OptionType[] = [];
-
-
 
   // Fetch all projects
   invoke("getProjects", {}).then(tempProjects => {
@@ -61,13 +52,12 @@ const [options] = useState<OptionType[]>( () => {
 
     console.log('docResult', docResult);
     console.log('tempProjects', tempProjects);
-    (tempProjects as MCProject[]).map((p, idx) => {
-      (docResult[idx] || []).map((doc) => {
-        console.log('pushing to result', doc);
-        result.push({
-          id: doc.documentID,
-          title: `${p.title}/${doc.title}`,
-        })
+
+    (tempProjects as MCProject[]).forEach((p, idx) => {
+      console.log('pushing', p);
+      result.push({
+        id: p.id,
+        title: p.title,
       })
     })
     console.log('result', result);
@@ -75,32 +65,12 @@ const [options] = useState<OptionType[]>( () => {
   })
 
 
-
-
-
-
-  //const result: OptionType[] = [];
-
-
-  // localProjects.map((p, idx) => {
-  //   (docResult[idx] || []).map((doc) => {
-  //     console.log('pushing to result', doc);
-  //     result.push({
-  //       id: doc.documentID,
-  //       title: `${p.title}/${doc.title}`,
-  //     })
-  //   })
-  // })
-
-
-
-  return result
 });
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
-
+  console.log('options', options);
   return (
     <>
-      <Select label="Diagram" name="documentID">
+      <Select label="Project" name="projectTitle">
         {options.map((p) => (
           <Option label={p.title} value={p.id}/>
         ))}
@@ -112,48 +82,6 @@ const [options] = useState<OptionType[]>( () => {
         ))}
       </Select>
 
-      <TextField
-        name="Token"
-        label="Token"
-        defaultValue={isToken}
-      />
-
-      <TextField
-        name="Projects"
-        label="Projects"
-        defaultValue={projects ? projects.length : -1}
-      />
-
-      <TextField
-        name="Documents"
-        label="Documents"
-        defaultValue={documents ? documents.length : -1}
-      />
-
     </>
   );
 }
-// export const Config = () => {
-//   const [data, setData] = useState(null);
-//   // const [productContext, setProductContext] = useState({});
-//   // const config = productContext?.extension?.config || ({} as ConfigType);
-
-//   useEffect(() => {
-//     invoke("getProjects", {}).then(setData);
-//     // invoke("getText", { example: "my-invoke-variable" }).then(setData);
-//   }, []);
-//   return (
-//     <>
-//       <TextField
-//         name="name"
-//         label="Pet name"
-//         defaultValue={defaultConfig.name}
-//       />
-//       <TextField
-//         name="age"
-//         label="Pet age"
-//         defaultValue={data ? data.length : -1}
-//       />
-//     </>
-//   );
-// };
