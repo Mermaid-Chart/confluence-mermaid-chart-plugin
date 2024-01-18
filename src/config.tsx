@@ -63,7 +63,7 @@ const [options] = useState<OptionType[]>( () => {
     console.log('result', result);
     return result;
   })
-
+  return result;
 
 });
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
