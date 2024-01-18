@@ -17,10 +17,10 @@ const App = () => {
   const [productContext, setProductContext] = useState({});
   // const config = productContext?.extension?.config || ({} as ConfigType);
 
-  // useEffect(() => {
-  //   invoke("getText", { example: "my-invoke-variable" }).then(setData);
-  //   // invoke("getText", { example: "my-invoke-variable" }).then(setData);
-  // }, []);
+  useEffect(() => {
+    invoke("getText", { example: "my-invoke-variable" }).then(setData);
+    // invoke("getText", { example: "my-invoke-variable" }).then(setData);
+  }, []);
 
   return (
     <>

@@ -29,43 +29,38 @@ export const Config = () => {
   useEffect(() => {
     invoke("getTokenExist", {}).then(setToken);
     invoke("getProjects", {}).then(setProjects);
-    //invoke("getDocuments", {}).then(setDocuments);
-    const payload = { projectID: 'apa'}
-    const docs =  invoke("getDocuments", {payload, test:'per'})
+
+    //const payload = { projectID: 'apa'}
+    //const docs =  invoke("getDocuments",  { projectID: 'apa'})
   }, []);
 
 
 
 const [options] = useState<OptionType[]>( () => {
-  //const isToken = await isTokenExists();
-  // useEffect(() => {
-  //   invoke("isTokenExist", {}).then(setToken);
-  // }, []);
 
+  if (isToken === 'false') {
+    console.log('no token exist');
+    return [];
+  } else {
+    console.log('token exist');
+  }
 
-  if (!isToken) return [];
-  // //const projects = await fetchProjects()
-  // useEffect(() => {
-  //   invoke("getProjects", {}).then(setProjects);
-  // }, []);
   const dp = []
+  invoke("getProjects", {}).then(tempProjects => {
+    console.log('Projects:', tempProjects);
 
-  //projects.map((p) => dp.push(fetchDocuments(p.id)))
-
-  projects.forEach((p) => {
-    const payload = { projectID: 'apa'}
-    const docs =  invoke("getDocuments", {payload, test:'per'})
-    dp.push(docs)
+    (tempProjects as MCProject[]).map((p) => {
+      invoke("getDocuments", {projectID: p.id}).then(tempDocuments => {
+        console.log('Documents:', tempDocuments);
+        dp.push(tempDocuments);
+      })
+    })
   })
-  // projects.map((p) => {
-  //   useEffect(() => {
-  //     invoke("getDocuments", {payload: p.id}).then(setDocuments);
-  //   }, []);
-  //   dp.push(documents);
-  // })
+
 
   const docResult: MCDocument[][] = dp;
-
+  console.log('docResult', docResult);
+  console.log('projects', projects);
 
   const result: OptionType[] = [];
   projects.map((p, idx) => {
@@ -76,6 +71,8 @@ const [options] = useState<OptionType[]>( () => {
       })
     })
   })
+
+
   return result
 });
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
