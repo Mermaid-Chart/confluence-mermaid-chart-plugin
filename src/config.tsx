@@ -39,39 +39,61 @@ export const Config = () => {
 const [options] = useState<OptionType[]>( () => {
 
   if (isToken === 'false') {
-    console.log('no token exist');
     return [];
-  } else {
-    console.log('token exist');
   }
 
-  const dp = []
+  const localProjects = new Array<MCProject>();
+  const dp = [];
+  const result: OptionType[] = [];
+  const docResult: MCDocument[][] = [];
+  // Fetch all projects
   invoke("getProjects", {}).then(tempProjects => {
     console.log('Projects:', tempProjects);
 
     (tempProjects as MCProject[]).map((p) => {
+      //localProjects.push(p);
       invoke("getDocuments", {projectID: p.id}).then(tempDocuments => {
         console.log('Documents:', tempDocuments);
         dp.push(tempDocuments);
       })
     })
-  })
 
-
-  const docResult: MCDocument[][] = dp;
-  console.log('docResult', docResult);
-  console.log('projects', projects);
-
-  const result: OptionType[] = [];
-  projects.map((p, idx) => {
-    (docResult[idx] || []).map((doc) => {
-      result.push({
-        id: doc.documentID,
-        title: `${p.title}/${doc.title}`,
+    const docResult: MCDocument[][] = dp;
+    console.log('docResult', docResult);
+    console.log('tempProjects', tempProjects);
+    (tempProjects as MCProject[]).map((p, idx) => {
+      (docResult[idx] || []).map((doc) => {
+        result.push({
+          id: doc.documentID,
+          title: `${p.title}/${doc.title}`,
+        })
       })
     })
+    console.log('result', result);
+    return result;
   })
 
+  console.log('docResult.length', docResult.length);
+  console.log('docResult', docResult);
+  console.log('localProjects', localProjects);
+
+
+
+
+  //const result: OptionType[] = [];
+
+
+  // localProjects.map((p, idx) => {
+  //   (docResult[idx] || []).map((doc) => {
+  //     console.log('pushing to result', doc);
+  //     result.push({
+  //       id: doc.documentID,
+  //       title: `${p.title}/${doc.title}`,
+  //     })
+  //   })
+  // })
+
+  console.log('result', result);
 
   return result
 });

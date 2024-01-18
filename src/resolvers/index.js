@@ -34,12 +34,9 @@ resolver.define("getDocument", async (req) => {
 
 resolver.define("getDocuments", async (req) => {
   console.log("getDocuments called");
-  console.log("req:", req);
-  // const projectID = req.payload.projectID;
-  // const documents = await fetchDocuments(projectID);
-
-  // return documents;
-  return { larsa: "cool" };
+  const projectID = req.payload.projectID;
+  const documents = await fetchDocuments(projectID);
+  return documents;
 });
 
 resolver.define("getProjects", async (req) => {
