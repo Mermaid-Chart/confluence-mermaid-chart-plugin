@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from "react";
 import ForgeReconciler, { Text } from "@forge/react";
-import { invoke } from "@forge/bridge";
+import { invoke, view } from "@forge/bridge";
 import { Config } from "../config";
-// import {
-//   fetchDiagramSVG,
-//   fetchDocument,
-//   fetchDocuments,
-//   fetchProjects,
-//   isTokenExists,
-//   MCDocument,
-// } from "../api";
 
 const App = () => {
   // const config = (useConfig() || {}) as ConfigType;
   const [data, setData] = useState(null);
   const [productContext, setProductContext] = useState({});
-  // const config = productContext?.extension?.config || ({} as ConfigType);
+  //const config = productContext?.extension?.config || ({} as ConfigType);
+  const [context, setContext] = useState({});
+
 
   useEffect(() => {
     invoke("getText", { example: "my-invoke-variable" }).then(setData);
-    // invoke("getText", { example: "my-invoke-variable" }).then(setData);
+    view.getContext().then(setContext);
   }, []);
 
+  const config = context?.extension?.config;
+  const selectedProject = config?.projectTitle;
   return (
     <>
       <Text>Hello world(ui-kit-2)!</Text>
-      <Text>{data ? data : "Loading..."}</Text>
-      <Text>Config: {productContext?.extension?.config?.age}</Text>
+      <Text>Selected Project: {selectedProject}</Text>
     </>
   );
 };
@@ -36,4 +31,5 @@ ForgeReconciler.render(
     <App />
   </React.StrictMode>
 );
+
 ForgeReconciler.addConfig(<Config />);

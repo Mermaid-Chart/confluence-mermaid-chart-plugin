@@ -72,7 +72,7 @@ const [options] = useState<OptionType[]>( () => {
     <>
       <Select label="Project" name="projectTitle">
         {options.map((p) => (
-          <Option label={p.title} value={p.id}/>
+          <Option label={p.title} value={p.title}/>
         ))}
       </Select>
       <TextField name="caption" label="Caption" />
