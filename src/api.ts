@@ -47,6 +47,7 @@ const requestJSON = async (path: string, newToken?: string) => {
 export const isTokenExists = async () => {
   return !!(await storage.getSecret(TOKEN_KEY));
 };
+
 export const fetchProjects = async (): Promise<MCProject[]> => {
   return requestJSON("rest-api/projects");
 };

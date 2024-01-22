@@ -42,7 +42,6 @@ resolver.define("getDocuments", async (req) => {
 resolver.define("getProjects", async (req) => {
   console.log("getProjects called");
   const projects = await fetchProjects();
-  //console.log("Projects: ", projects);
   return projects;
 });
 
