@@ -44,6 +44,29 @@ const requestJSON = async (path: string, newToken?: string) => {
   return await response.json();
 };
 
+const postJSON = async (path: string, newToken?: string) => {
+  console.log("postJSON:", path);
+  const [token] = await Promise.all<string>([storage.getSecret(TOKEN_KEY)]);
+  const response = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    body: JSON.stringify({}),
+    headers: {
+      Authorization: `Bearer ${newToken || token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.status >= 500) {
+    throw new Error("Internal error");
+  }
+  if (response.status > 400) {
+    throw new Error(
+      "Authentication error, please check access token in settings"
+    );
+  }
+
+  return (await response.json()) as MCDocument;
+};
+
 export const isTokenExists = async () => {
   return !!(await storage.getSecret(TOKEN_KEY));
 };
@@ -56,6 +79,12 @@ export const fetchDocuments = async (
   projectId: string
 ): Promise<MCDocument[]> => {
   return requestJSON(`rest-api/projects/${projectId}/documents`);
+};
+
+export const createDocument = async (
+  projectId: string
+): Promise<MCDocument> => {
+  return postJSON(`rest-api/projects/${projectId}/documents`);
 };
 
 export const fetchDocument = async (

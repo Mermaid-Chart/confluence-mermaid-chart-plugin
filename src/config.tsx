@@ -39,11 +39,7 @@ export const Config = () => {
   // Set the token and projects
   useEffect(() => {
     console.log('useEffect called');
-    // const p1 = invoke("getTokenExist", {});
-    // p1.then(setToken)
 
-    // console.log('getProjects called');
-    // invoke("getProjects", {}).then(setProjects);
 
       const promises = [];
 

@@ -8,13 +8,6 @@ permissions:
   scopes:
     - storage:app
 modules:
-  # confluence:contentAction:
-  #   - key: epa-hello-world-content-action
-  #     resource: main
-  #     resolver:
-  #       function: resolver
-  #     render: native
-  #     title: EPA
   macro:
     - key: mermaid
       title: Mermaid chart X
@@ -33,17 +26,12 @@ modules:
   function:
     - key: resolver
       handler: index.handler
-    # - key: config-function-key
-    #   handler: index.config
-
-    #   # - key: main
-    #   #   handler: index.run
     - key: main-settings
       handler: settings.run
 
 resources:
   - key: main
-    path: src/frontend/index.jsx
+    path: src/frontend/index.tsx
 
 app:
   id: ari:cloud:ecosystem::app/a36ca994-14b4-48d0-8970-e4515eae559f
