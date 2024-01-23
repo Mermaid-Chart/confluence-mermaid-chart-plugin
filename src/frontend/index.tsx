@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ForgeReconciler, { Text, TextField, Option, Select, Link, Button } from "@forge/react";
 import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject, fetchProjects } from '../api';
+import { router } from "@forge/bridge";
 //import { Config } from "../config";
 
 type ProjectsOptionType = {
@@ -21,6 +22,12 @@ const defaultProjectConfig =
 };
 
 const projectOptionExternal: ProjectsOptionType[] = [];
+
+const openDiagram = (documentID:string) => {
+  const diagramURL = `https://www.mermaidchart.com/app/diagrams/${documentID}?ref=vscode`
+  router.open(diagramURL);
+}
+
 
 const Config = () => {
   const [isToken, setToken] = useState(null);
@@ -171,13 +178,14 @@ const App = () => {
   return (
     <>
       <Text>Hello world(ui-kit-2)!</Text>
-      <Text>{config.name} is {config.age} years old.</Text>
       <Text>Selected projectID is {config.projectID} .</Text>
       <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Edit diagram</Link></Text>
       <Button onClick={() => {
         const payload = { projectID: config.projectID}
         invoke("makeDocument", {payload}).then((result) => {
           console.log('result: ', result);
+          const mcDocument = result as MCDocument;
+          openDiagram(mcDocument.documentID);
         });
       }}> Create Diagram</Button>
 

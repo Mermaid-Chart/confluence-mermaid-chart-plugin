@@ -2,6 +2,7 @@ import Resolver from "@forge/resolver";
 import {
   fetchDiagramSVG,
   fetchDocument,
+  createDocument,
   fetchDocuments,
   fetchProjects,
   isTokenExists,
@@ -29,6 +30,15 @@ resolver.define("getDocument", async (req) => {
   const documentID = req.payload.documentID;
   const document = await fetchDocument(documentID);
   //console.log("document: ", document);
+  return document;
+});
+
+resolver.define("makeDocument", async (req) => {
+  console.log("makeDocument, req:", req);
+  const projectID = req.payload.payload.projectID;
+  console.log("projectID: ", projectID);
+  const document = await createDocument(projectID);
+  console.log("document: ", document);
   return document;
 });
 
