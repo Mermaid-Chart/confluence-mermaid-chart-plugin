@@ -6,6 +6,8 @@ modules:
         function: resolver
       title: confluence-macro-custom-ui
       description: Inserts Hello world!
+      config:
+        function: config-function-key
   confluence:contentAction:
     - key: my-content-action
       resource: main
@@ -13,6 +15,8 @@ modules:
   function:
     - key: resolver
       handler: index.handler
+    - key: config-function-key
+      handler: config.config
 resources:
   - key: main
     path: static/hello-world/build
