@@ -96,11 +96,10 @@ const Config = () => {
   const pDiagramAction = invoke("getDiagramAction", {});
   console.log('pDiagramAction: ', pDiagramAction);
   pDiagramAction.then((result) => {
-    console.log('result: ', result.toString());
-    setSelectDiagramAction(result.toString());
+    console.log('result: ', result);
+    setSelectDiagramAction(result as string);
   });
-  console.log('selectedDiagramAction');
-
+  console.log('selectedDiagramAction', selectedDiagramAction);
 
 
 
@@ -123,8 +122,22 @@ const Config = () => {
         <Radio label="Create new Diagram" value="Create"/>
       </RadioGroup>
 
-     <TextArea name={selectedDiagramAction} label={selectedDiagramAction} />
 
+      {selectedDiagramAction === "None" &&
+        (<TextField name="None" label="None" />)
+      }
+
+      {selectedDiagramAction === "Edit" &&
+        (<TextField name="Edit" label="Edit" />)
+      }
+
+      {selectedDiagramAction === "Create" &&
+        (<TextField name="Create" label="Create" />)
+      }
+
+      {selectedDiagramAction === "Refresh" &&
+        (<TextField name="Refresh" label="Refresh" />)
+      }
 
     </>
   );

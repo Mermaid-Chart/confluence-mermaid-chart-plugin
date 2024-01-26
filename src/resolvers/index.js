@@ -79,9 +79,34 @@ resolver.define("storeDiagramAction", async (req) => {
   console.log("req: ", req);
   console.log("Diagram action:", req.payload.diagramAction);
 
-  const diagramAction = req.payload.diagramAction;
-  const result = storage.set("diagram-action", diagramAction);
-  return result;
+  //const diagramAction = req.payload.diagramAction;
+  // const value = req.payload.diagramAction.toString();
+  // console.log("value: ", value);
+
+  if (req.payload.diagramAction === undefined) {
+    const result = storage.set("diagram-action", "None");
+    return result;
+  }
+
+  if (req.payload.diagramAction === "None") {
+    const result = storage.set("diagram-action", "None");
+    return result;
+  }
+
+  if (req.payload.diagramAction === "Edit") {
+    const result = storage.set("diagram-action", "Edit");
+    return result;
+  }
+
+  if (req.payload.diagramAction === "Refresh") {
+    const result = storage.set("diagram-action", "Refresh");
+    return result;
+  }
+
+  if (req.payload.diagramAction === "Create") {
+    const result = storage.set("diagram-action", "Create");
+    return result;
+  }
 });
 
 resolver.define("getDiagramAction", async (req) => {
@@ -89,6 +114,7 @@ resolver.define("getDiagramAction", async (req) => {
   console.log("req: ", req);
 
   const result = await storage.get("diagram-action");
+
   return result;
 });
 
