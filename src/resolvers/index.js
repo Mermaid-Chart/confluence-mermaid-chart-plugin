@@ -8,6 +8,9 @@ import {
   isTokenExists,
   MCDocument,
 } from "../api";
+import { storage } from "@forge/api";
+
+import { updateMacroConfig } from "../macroConfigApi.ts";
 const resolver = new Resolver();
 
 resolver.define("getText", async (req) => {
@@ -60,6 +63,33 @@ resolver.define("getTokenExist", async (req) => {
   const tokenExist = await isTokenExists();
   console.log("tokenExist: ", tokenExist);
   return tokenExist;
+});
+
+resolver.define("updateConfig", async (req) => {
+  console.log("updateConfig called");
+
+  const macroID = "1234";
+  const config = req.payload.config;
+  const newConfig = await updateMacroConfig(macroID, config);
+  return newConfig;
+});
+
+resolver.define("storeDiagramAction", async (req) => {
+  console.log("storeData called");
+  console.log("req: ", req);
+  console.log("Diagram action:", req.payload.diagramAction);
+
+  const diagramAction = req.payload.diagramAction;
+  const result = storage.set("diagram-action", diagramAction);
+  return result;
+});
+
+resolver.define("getDiagramAction", async (req) => {
+  console.log("getDiagramAction");
+  console.log("req: ", req);
+
+  const result = await storage.get("diagram-action");
+  return result;
 });
 
 export const handler = resolver.getDefinitions();

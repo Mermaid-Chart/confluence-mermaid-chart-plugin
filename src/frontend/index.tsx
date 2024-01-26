@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import ForgeReconciler, { Text, TextField, Option, Select, Link, Button } from "@forge/react";
+import ForgeReconciler, { Text, TextField, Option,
+  Select, Link, RadioGroup, Radio, Button,
+TextArea  } from "@forge/react";
 import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject, fetchProjects } from '../api';
 import { router } from "@forge/bridge";
-//import { Config } from "../config";
 
 type ProjectsOptionType = {
   id: string;
@@ -29,11 +30,13 @@ const openDiagram = (documentID:string) => {
 }
 
 
+
+
 const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
-
+  const [selectedDiagramAction, setSelectDiagramAction] = useState("None");
   useEffect(() => {
 
     const promises = [];
@@ -48,7 +51,7 @@ const Config = () => {
           const pProjects = invoke("getProjects", {});
           pProjects.then(setProjects);
           pProjects.then((proj) => {
-            console.log('projects: ', proj)
+            //console.log('projects: ', proj)
             setProjects(proj as MCProject[]);
           });
           promises.push(pProjects);
@@ -76,17 +79,29 @@ const Config = () => {
 
   // Set the options
   useEffect(() => {
-    console.log('useEffect options called');
+    //console.log('useEffect options called');
     const projectOptions: ProjectsOptionType[] = [];
 
     projects.forEach((project) => {
       projectOptions.push({ id: project.id, title: project.title });
     });
 
-    console.log('projectOptions: ', projectOptions);
-    console.log('projectOptionExternal: ', projectOptionExternal);
+    // console.log('projectOptions: ', projectOptions);
+    // console.log('projectOptionExternal: ', projectOptionExternal);
     setOptions(projectOptions);
   }, [projects]);
+
+
+  console.log('Prior call to getDiagramAction');
+  const pDiagramAction = invoke("getDiagramAction", {});
+  console.log('pDiagramAction: ', pDiagramAction);
+  pDiagramAction.then((result) => {
+    console.log('result: ', result.toString());
+    setSelectDiagramAction(result.toString());
+  });
+  console.log('selectedDiagramAction');
+
+
 
 
   return (
@@ -99,6 +114,17 @@ const Config = () => {
             <Option label={p.title} value={p.id}/>
           ))}
       </Select>
+
+
+      <RadioGroup label="Diagram Actions" name="diagramAction">
+        <Radio label="None" value="None" defaultChecked/>
+        <Radio label="Edit Diagram" value="Edit"/>
+        <Radio label="Refresh Diagram" value="Refresh"/>
+        <Radio label="Create new Diagram" value="Create"/>
+      </RadioGroup>
+
+     <TextArea name={selectedDiagramAction} label={selectedDiagramAction} />
+
 
     </>
   );
@@ -126,7 +152,7 @@ const App = () => {
           const pProjects = invoke("getProjects", {});
           pProjects.then(setProjects);
           pProjects.then((proj) => {
-            console.log('projects: ', proj)
+            //console.log('projects: ', proj)
             setProjects(proj as MCProject[]);
           });
           promises.push(pProjects);
@@ -154,7 +180,7 @@ const App = () => {
 
   // Set the options
   useEffect(() => {
-    console.log('useEffect options called');
+    // console.log('useEffect options called');
     const projectOptions: ProjectsOptionType[] = [];
 
     projects.forEach((project) => {
@@ -162,14 +188,20 @@ const App = () => {
       projectOptionExternal.push({ id: project.id, title: project.title });
     });
 
-    console.log('projectOptions: ', projectOptions);
-    console.log('projectOptionExternal: ', projectOptionExternal);
+    // console.log('projectOptions: ', projectOptions);
+    // console.log('projectOptionExternal: ', projectOptionExternal);
     setOptions(projectOptions);
   }, [projects]);
 
 
   const config = context?.extension.config || defaultConfig;
   const age = config?.age;
+  const DiagramAction = config?.diagramAction;
+
+  invoke("storeDiagramAction", {diagramAction: DiagramAction}).then((result) => {
+    console.log('result: ', result);
+  });
+
 
   // Calling of createDiagram
   // const payload = { projectID: 'apa'}
@@ -179,6 +211,7 @@ const App = () => {
     <>
       <Text>Hello world(ui-kit-2)!</Text>
       <Text>Selected projectID is {config.projectID} .</Text>
+      <Text>Selected DiagramAction is {DiagramAction}</Text>
       <Text><Link openNewTab href={`https://www.mermaidchart.com/app/diagrams/${config.documentID}?ref=vscode`}>Edit diagram</Link></Text>
       <Button onClick={() => {
         const payload = { projectID: config.projectID}
