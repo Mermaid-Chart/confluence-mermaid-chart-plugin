@@ -27,8 +27,9 @@ const projectOptionExternal: ProjectsOptionType[] = [];
 const openDiagram = (documentID:string) => {
   //const diagramURL = `https://www.mermaidchart.com/app/diagrams/${documentID}?ref=vscode`
   //router.open(diagramURL);
-
-  const diagramURL = `https://www.google.com`
+  const diagramURL = `https://www.mermaidchart.com/app/projects?ref=vscode`
+  //router.open(diagramURL);
+  //const diagramURL = `https://www.google.com`
   router.open(diagramURL);
 }
 
@@ -102,17 +103,7 @@ const Config = () => {
   console.log('In config, selectedDiagramAction', selectedDiagramAction);
 
 
-  // Conditiobal rendering of the diagramAction
-  let content;
-  if(selectedDiagramAction == "None") {
-    content = <TextField name="None" label="None" />;
-  } else if(selectedDiagramAction == "Edit") {
-    content = <TextField name="Edit" label="Edit" />;
-  } else if(selectedDiagramAction == "Create") {
-    content = <TextField name="Create" label="Create" />;
-  } else if(selectedDiagramAction == "Refresh") {
-    content = <TextField name="Refresh" label="Refresh" />;
-  }
+
 
   return (
     <>
@@ -133,7 +124,7 @@ const Config = () => {
         <Radio label="Create new Diagram" value="Create"/>
       </RadioGroup>
 
-      {content}
+
     </>
   );
 };
