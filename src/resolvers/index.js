@@ -76,8 +76,10 @@ resolver.define("updateConfig", async (req) => {
 
 resolver.define("storeDiagramAction", async (req) => {
   console.log("storeData called");
-  console.log("req: ", req);
-  console.log("Diagram action:", req.payload.diagramAction);
+  console.log(
+    "In storeDiagramAction, Diagram action:",
+    req.payload.diagramAction
+  );
 
   //const diagramAction = req.payload.diagramAction;
   // const value = req.payload.diagramAction.toString();
@@ -111,7 +113,6 @@ resolver.define("storeDiagramAction", async (req) => {
 
 resolver.define("getDiagramAction", async (req) => {
   console.log("getDiagramAction");
-  console.log("req: ", req);
 
   const result = await storage.get("diagram-action");
 
