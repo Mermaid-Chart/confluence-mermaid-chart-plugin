@@ -18,7 +18,8 @@ export interface MCDocument {
   title: string;
 }
 
-const BASE_URL = "https://www.mermaidchart.com/";
+//const BASE_URL = "https://www.mermaidchart.com/";
+const BASE_URL = "https://test.mermaidchart.com/";
 
 const request = async (path: string, newToken?: string) => {
   const [token] = await Promise.all<string>([storage.getSecret(TOKEN_KEY)]);

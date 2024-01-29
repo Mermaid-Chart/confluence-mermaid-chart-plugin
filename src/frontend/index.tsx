@@ -6,6 +6,8 @@ import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject, fetchProjects } from '../api';
 import { router } from "@forge/bridge";
 
+const BASE_URL = "https://test.mermaidchart.com/";
+
 type ProjectsOptionType = {
   id: string;
   title: string;
@@ -24,38 +26,11 @@ const defaultProjectConfig =
 
 const projectOptionExternal: ProjectsOptionType[] = [];
 
-const openDiagram = (documentID:string) => {
-  //const diagramURL = `https://www.mermaidchart.com/app/diagrams/${documentID}?ref=vscode`
-  //router.open(diagramURL);
-  const diagramURL = `https://www.mermaidchart.com/app/projects?ref=vscode`
-  //router.open(diagramURL);
-  //const diagramURL = `https://www.google.com`
-  router.open(diagramURL);
-}
-
-const createNewDiagram = (projectID:string) => {
-
-  //const diagramURL = `https://www.mermaidchart.com/app/projects?ref=vscode`
-  //router.open(diagramURL);
-   // Calling of createDiagram
-  //const payload = { projectID: projectID}
-  const result =  invoke("makeDocument", {projectID: projectID});
-
-  result.then((result) => {
-    console.log('In createNewDiagram, result: ', result);
-    return result;
-  });
-
-
-
-}
-
 
 const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
-  const [selectedDiagramAction, setSelectDiagramAction] = useState("None");
   useEffect(() => {
 
     const promises = [];
@@ -111,14 +86,6 @@ const Config = () => {
   }, [projects]);
 
 
-  const pDiagramAction = invoke("getDiagramAction", {});
-  pDiagramAction.then((result) => {
-    setSelectDiagramAction(result as string);
-  });
-  console.log('In config, selectedDiagramAction', selectedDiagramAction);
-
-
-
 
   return (
     <>
@@ -149,19 +116,11 @@ const App = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
-  const [storedDiagramAction, setStoredDiagramAction] = useState(null);
+  const [document, setDocument] = useState<MCDocument>(null);
 
   // Set the token and projects
   useEffect(() => {
     view.getContext().then(setContext);
-
-    // Set the state of the stored diagram action
-    // from storage
-    const pDiagramAction = invoke("getDiagramAction", {});
-    pDiagramAction.then((result) => {
-      console.log('In App, read diagram action: ', result);
-      setStoredDiagramAction(result as string);
-    });
 
     // END useEffect
   }, []);
@@ -176,8 +135,7 @@ const App = () => {
       projectOptionExternal.push({ id: project.id, title: project.title });
     });
 
-    // console.log('projectOptions: ', projectOptions);
-    // console.log('projectOptionExternal: ', projectOptionExternal);
+
     setOptions(projectOptions);
   }, [projects]);
 
@@ -187,29 +145,54 @@ const App = () => {
   const DiagramAction = config?.diagramAction;
   const projectID = config?.projectID;
 
-  // Set the state of the stored diagram action
-  // from storage
-  // const pDiagramAction = invoke("getDiagramAction", {});
-  // pDiagramAction.then((result) => {
-  //   console.log('In App, read diagram action: ', result);
-  //   setStoredDiagramAction(result as string);
-  // });
 
 
-  console.log('In App, selectedDiagramAction', DiagramAction);
-  console.log('In App, storedDiagramAction', storedDiagramAction);
 
-  // Conditional routing based on new DiagramAction
-  // and previous status
-  if(DiagramAction == "Create" && storedDiagramAction == "None") {
-    const newDiagram = createNewDiagram(projectID);
-    console.log('In App, newDiagram: ', newDiagram);
+  const openDiagram = (documentID:string) => {
+    console.log('In openDiagram, documentID: ', documentID);
+    //const diagramURL = `https://www.mermaidchart.com/app/diagrams/${documentID}?ref=vscode`
+    const diagramURL = `${BASE_URL}app/diagrams/${documentID}?ref=vscode`
+    router.open(diagramURL);
+  }
 
-    // Update the stored diagram action (previous)
-    invoke("storeDiagramAction", {diagramAction: "Create"}).then((result) => {
-      console.log('result: ', result);
+  const createNewDiagram = async (projectID:string) => {
+    console.log('In createNewDiagram, projectID: ', projectID);
+    const result =  invoke("makeDocument", {projectID: projectID});
+
+    result.then((result) => {
+      console.log('In createNewDiagram, result: ', result);
+      setDocument(result as MCDocument);
+      return result;
     });
   }
+
+  //console.log('In App, storedDiagramAction', storedDiagramAction);
+
+
+  // If DiagramAction is "Create" and previous status is "None"
+  // 1. Wait for the stored diagram action to be fetched
+  // 2. Check the DiagramAction from the config
+  // 3. If DiagramAction is "Create" and previous status is "None"
+  //   then create a new diagram
+  // 4. Wait until the the stored diagram action is updated
+  const pDiagramAction = invoke("getDiagramAction", {});
+  pDiagramAction.then((result) => {
+
+    console.log('In App, read diagram action: ', result);
+
+    if(DiagramAction == "Create" && result == "None") {
+      // Update the stored diagram action
+      invoke("storeDiagramAction", {diagramAction: "Create"}).then((result) => {
+        console.log('result: ', result);
+
+        // Create a new diagram
+        const newDiagram = createNewDiagram(projectID).then((result) => {
+          console.log('In App, newDiagram: ', result);
+        });
+      });
+    }
+
+  });
 
   // Shall be able to reset the stored diagram action to "None"
   if(DiagramAction == "None" ) {
@@ -220,14 +203,7 @@ const App = () => {
   }
 
 
-  // invoke("storeDiagramAction", {diagramAction: DiagramAction}).then((result) => {
-  //   console.log('result: ', result);
-  // });
 
-
-  // Calling of createDiagram
-  // const payload = { projectID: 'apa'}
-  //  const docs =  invoke("getDocuments", {payload, test:'per'})
 
   return (
     <>
