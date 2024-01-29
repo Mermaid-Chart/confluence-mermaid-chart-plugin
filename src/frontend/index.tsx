@@ -150,23 +150,24 @@ const App = () => {
 
   const openDiagram = (documentID:string) => {
     console.log('In openDiagram, documentID: ', documentID);
-    //const diagramURL = `https://www.mermaidchart.com/app/diagrams/${documentID}?ref=vscode`
     const diagramURL = `${BASE_URL}app/diagrams/${documentID}?ref=vscode`
     router.open(diagramURL);
   }
 
   const createNewDiagram = async (projectID:string) => {
     console.log('In createNewDiagram, projectID: ', projectID);
+    let newDiagram: MCDocument = null;
     const result =  invoke("makeDocument", {projectID: projectID});
 
     result.then((result) => {
       console.log('In createNewDiagram, result: ', result);
       setDocument(result as MCDocument);
+      newDiagram = result as MCDocument;
+      openDiagram(newDiagram.documentID);
       return result;
     });
   }
 
-  //console.log('In App, storedDiagramAction', storedDiagramAction);
 
 
   // If DiagramAction is "Create" and previous status is "None"
@@ -208,9 +209,7 @@ const App = () => {
   return (
     <>
       <Text>Hello world(ui-kit-2)!</Text>
-
       <Text>Selected DiagramAction is {DiagramAction}</Text>
-
       <Text>Selected ProjectID is {projectID}</Text>
 
 
