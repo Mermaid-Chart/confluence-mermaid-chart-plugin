@@ -38,7 +38,7 @@ resolver.define("getDocument", async (req) => {
 
 resolver.define("makeDocument", async (req) => {
   console.log("makeDocument, req:", req);
-  const projectID = req.payload.payload.projectID;
+  const projectID = req.payload.projectID;
   console.log("projectID: ", projectID);
   const document = await createDocument(projectID);
   console.log("document: ", document);

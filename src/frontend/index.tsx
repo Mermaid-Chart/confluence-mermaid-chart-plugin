@@ -33,7 +33,22 @@ const openDiagram = (documentID:string) => {
   router.open(diagramURL);
 }
 
+const createNewDiagram = (projectID:string) => {
 
+  //const diagramURL = `https://www.mermaidchart.com/app/projects?ref=vscode`
+  //router.open(diagramURL);
+   // Calling of createDiagram
+  //const payload = { projectID: projectID}
+  const result =  invoke("makeDocument", {projectID: projectID});
+
+  result.then((result) => {
+    console.log('In createNewDiagram, result: ', result);
+    return result;
+  });
+
+
+
+}
 
 
 const Config = () => {
@@ -170,7 +185,7 @@ const App = () => {
   const config = context?.extension.config || defaultConfig;
   const age = config?.age;
   const DiagramAction = config?.diagramAction;
-
+  const projectID = config?.projectID;
 
   // Set the state of the stored diagram action
   // from storage
@@ -187,7 +202,8 @@ const App = () => {
   // Conditional routing based on new DiagramAction
   // and previous status
   if(DiagramAction == "Create" && storedDiagramAction == "None") {
-    openDiagram('apa');
+    const newDiagram = createNewDiagram(projectID);
+    console.log('In App, newDiagram: ', newDiagram);
 
     // Update the stored diagram action (previous)
     invoke("storeDiagramAction", {diagramAction: "Create"}).then((result) => {
@@ -218,6 +234,8 @@ const App = () => {
       <Text>Hello world(ui-kit-2)!</Text>
 
       <Text>Selected DiagramAction is {DiagramAction}</Text>
+
+      <Text>Selected ProjectID is {projectID}</Text>
 
 
     </>
