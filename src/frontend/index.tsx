@@ -24,6 +24,7 @@ const Config = () => {
   const [options, setOptions] = useState([]);
   const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
   const [projAndDocOptions, setProjAndDocOptions] = useState([]);
+
   // Set the options
   useEffect(() => {
     //console.log('useEffect options called');
@@ -71,10 +72,6 @@ const Config = () => {
     });
   }, [projects]);
 
-
-
-
-
   return (
     <>
       <Select label="Project for New Diagram" name="projectID">
@@ -103,35 +100,15 @@ const Config = () => {
 
 const App = () => {
   const [context, setContext] = useState(undefined);
-  const [isToken, setToken] = useState(null);
-  const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
-  const [options, setOptions] = useState([]);
-  const [document, setDocument] = useState<MCDocument>(null);
 
   const config = context?.extension.config;
   const DiagramAction = config?.diagramAction;
   const projectID = config?.projectID;
 
-
-  // Set the token and projects
+  // Set the context
   useEffect(() => {
     view.getContext().then(setContext);
-
-    // END useEffect
   }, []);
-
-  // Set the options
-  useEffect(() => {
-    // console.log('useEffect options called');
-    const projectOptions: ProjectsOptionType[] = [];
-
-    projects.forEach((project) => {
-      projectOptions.push({ id: project.id, title: project.title });
-    });
-
-    setOptions(projectOptions);
-  }, [projects]);
-
 
   const openDiagram = (documentID:string) => {
     console.log('In openDiagram, documentID: ', documentID);
@@ -146,14 +123,11 @@ const App = () => {
 
     result.then((result) => {
       console.log('In createNewDiagram, result: ', result);
-      setDocument(result as MCDocument);
       newDiagram = result as MCDocument;
       openDiagram(newDiagram.documentID);
       return result;
     });
   }
-
-
 
   // If DiagramAction is "Create" and previous status is "None"
   // 1. Wait for the stored diagram action to be fetched
@@ -187,9 +161,6 @@ const App = () => {
       console.log('result: ', result);
     });
   }
-
-
-
 
   return (
     <>
