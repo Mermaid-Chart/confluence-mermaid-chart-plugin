@@ -104,6 +104,7 @@ const App = () => {
   const config = context?.extension.config;
   const DiagramAction = config?.diagramAction;
   const projectID = config?.projectID;
+  const documentID = config?.documentID;
 
   // Set the context
   useEffect(() => {
@@ -129,17 +130,15 @@ const App = () => {
     });
   }
 
-  // If DiagramAction is "Create" and previous status is "None"
-  // 1. Wait for the stored diagram action to be fetched
-  // 2. Check the DiagramAction from the config
-  // 3. If DiagramAction is "Create" and previous status is "None"
-  //   then create a new diagram
-  // 4. Wait until the the stored diagram action is updated
+  // Read the stored, last selected diagram action
+  // and take action depending on the new selected diagram action
+  // from config-panel.
+  // Note: This is a workaround
   const pDiagramAction = invoke("getDiagramAction", {});
   pDiagramAction.then((result) => {
 
-    console.log('In App, read diagram action: ', result);
-
+    // A new diagram shall be created
+    // and route the user to editor of the new diagram
     if(DiagramAction == "Create" && result == "None") {
       // Update the stored diagram action
       invoke("storeDiagramAction", {diagramAction: "Create"}).then((result) => {
@@ -149,6 +148,18 @@ const App = () => {
         const newDiagram = createNewDiagram(projectID).then((result) => {
           console.log('In App, newDiagram: ', result);
         });
+      });
+    }
+
+    // An existing diagram shall be edited.
+    // Route the user to editor of the new diagram
+    if(DiagramAction == "Edit" && result == "None") {
+      // Update the stored diagram action
+      invoke("storeDiagramAction", {diagramAction: "Edit"}).then((result) => {
+        console.log('result: ', result);
+
+        // Open the diagram
+        openDiagram(config.documentID);
       });
     }
 
@@ -167,6 +178,7 @@ const App = () => {
       <Text>Hello world(ui-kit-2)!</Text>
       <Text>Selected DiagramAction is {DiagramAction}</Text>
       <Text>Selected ProjectID is {projectID}</Text>
+      <Text>Selected DiagramID is {documentID}</Text>
     </>
   );
 };
