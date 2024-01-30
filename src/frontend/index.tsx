@@ -31,8 +31,8 @@ const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
-  useEffect(() => {
 
+  useEffect(() => {
     const promises = [];
 
     if(projects.length === 0) {
@@ -89,15 +89,17 @@ const Config = () => {
 
   return (
     <>
-      <TextField name="name" label="Pet name" defaultValue={defaultConfig.name} />
-      <TextField name="age" label="Pet age" defaultValue={defaultConfig.age} />
-
-      <Select  label="Project" name="projectID">
+      <Select label="Project for New Diagram" name="projectID">
         {options.map((p) => (
             <Option label={p.title} value={p.id}/>
           ))}
       </Select>
 
+      <Select label="Document for Edit/Refresh" name="documentID">
+        <Option label="Document 1" value="1"/>
+        <Option label="Document 2" value="2"/>
+        <Option label="Document 3" value="3"/>
+      </Select>
 
       <RadioGroup label="Diagram Actions" name="diagramAction">
         <Radio label="None" value="None" defaultChecked/>
@@ -117,6 +119,11 @@ const App = () => {
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
   const [document, setDocument] = useState<MCDocument>(null);
+
+  const config = context?.extension.config || defaultConfig;
+  const DiagramAction = config?.diagramAction;
+  const projectID = config?.projectID;
+
 
   // Set the token and projects
   useEffect(() => {
@@ -139,11 +146,6 @@ const App = () => {
     setOptions(projectOptions);
   }, [projects]);
 
-
-  const config = context?.extension.config || defaultConfig;
-  const age = config?.age;
-  const DiagramAction = config?.diagramAction;
-  const projectID = config?.projectID;
 
 
 
@@ -211,8 +213,6 @@ const App = () => {
       <Text>Hello world(ui-kit-2)!</Text>
       <Text>Selected DiagramAction is {DiagramAction}</Text>
       <Text>Selected ProjectID is {projectID}</Text>
-
-
     </>
   );
 };
