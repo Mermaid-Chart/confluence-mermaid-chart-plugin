@@ -13,17 +13,17 @@ type ProjectsOptionType = {
   title: string;
 }
 
-
-
-const projectOptionExternal: ProjectsOptionType[] = [];
-
+type ProjAndDocOptionType = {
+  id: string;
+  title: string;
+}
 
 const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
   const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
-
+  const [projAndDocOptions, setProjAndDocOptions] = useState([]);
   // Set the options
   useEffect(() => {
     //console.log('useEffect options called');
@@ -34,7 +34,6 @@ const Config = () => {
     });
 
     // console.log('projectOptions: ', projectOptions);
-    // console.log('projectOptionExternal: ', projectOptionExternal);
     setOptions(projectOptions);
   }, [projects]);
 
@@ -55,14 +54,25 @@ const Config = () => {
     // if(!isToken)  return [];
     console.log('useEffect, get documents');
     const dp = [];
+    const projAndDocOptions: ProjAndDocOptionType[] = [];
     projects.forEach((project) => {
       const pDocuments = invoke("getDocuments", {projectID: project.id});
       pDocuments.then((docs) => {
         dp.push(docs);
         console.log('dp: ', dp);
+        console.log('project.id ', project.id);
+
+        (docs as MCDocument[]).forEach((doc) => {
+          projAndDocOptions.push({ id: doc.documentID, title: `${project.title}/${doc.title}}`});
+        });
+        console.log('projAndDocOptions: ', projAndDocOptions);
+        setProjAndDocOptions(projAndDocOptions);
       });
     });
   }, [projects]);
+
+
+
 
 
   return (
@@ -74,9 +84,9 @@ const Config = () => {
       </Select>
 
       <Select label="Document for Edit/Refresh" name="documentID">
-        <Option label="Document 1" value="1"/>
-        <Option label="Document 2" value="2"/>
-        <Option label="Document 3" value="3"/>
+        {projAndDocOptions.map((p) => (
+            <Option label={p.title} value={p.id}/>
+          ))}
       </Select>
 
       <RadioGroup label="Diagram Actions" name="diagramAction">
@@ -117,15 +127,10 @@ const App = () => {
 
     projects.forEach((project) => {
       projectOptions.push({ id: project.id, title: project.title });
-      projectOptionExternal.push({ id: project.id, title: project.title });
     });
-
 
     setOptions(projectOptions);
   }, [projects]);
-
-
-
 
 
   const openDiagram = (documentID:string) => {
