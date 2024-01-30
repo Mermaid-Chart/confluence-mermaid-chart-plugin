@@ -31,45 +31,9 @@ const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
-
-  useEffect(() => {
-    const promises = [];
-
-    if(projects.length === 0) {
-    // If token empty, then get token
-      if(isToken === null) {
-        const pToken = invoke("getTokenExist", {});
-        pToken.then(setToken)
-
-        .then(() => {
-          const pProjects = invoke("getProjects", {});
-          pProjects.then(setProjects);
-          pProjects.then((proj) => {
-            //console.log('projects: ', proj)
-            setProjects(proj as MCProject[]);
-          });
-          promises.push(pProjects);
-        })
-      } else {
-        const pProjects = invoke("getProjects", {});
-        pProjects.then(setProjects)
-        promises.push(pProjects);
-      }
-    }
-
-    // Wait for all promises to complete
-    Promise.all(promises).then(() => {
-      console.log('isToken: ', isToken);
-      console.log('projects: ', projects);
-    });
-
-    if (isToken === 'false') {
-      setProjects([]);
-    }
+  const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
 
 
-    // END useEffect
-  }, []);
 
   // Set the options
   useEffect(() => {
@@ -83,6 +47,31 @@ const Config = () => {
     // console.log('projectOptions: ', projectOptions);
     // console.log('projectOptionExternal: ', projectOptionExternal);
     setOptions(projectOptions);
+  }, [projects]);
+
+  // Get projects
+  useEffect(() => {
+    // if(!isToken)  return [];
+    const pProjects = invoke("getProjects", {});
+    pProjects.then((proj) => {
+      console.log('projects: ', proj)
+      setProjects(proj as MCProject[]);
+    });
+
+  }, [isToken]);
+
+  // Get the documents
+  useEffect(() => {
+    // if(!isToken)  return [];
+    console.log('useEffect, get projects: ', projects);
+    const dp = [];
+    projects.forEach((project) => {
+      const pDocuments = invoke("getDocuments", {projectID: project.id});
+      pDocuments.then((docs) => {
+        dp.push(docs);
+        console.log('dp: ', dp);
+      });
+    });
   }, [projects]);
 
 
