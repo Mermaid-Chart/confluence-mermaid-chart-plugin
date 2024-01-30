@@ -13,16 +13,7 @@ type ProjectsOptionType = {
   title: string;
 }
 
-const defaultConfig = {
-  name: 'Unnamed Pet',
-  age: '0'
-};
 
-const defaultProjectConfig =
-{
-  name: 'Personal Project',
-  id: '0'
-};
 
 const projectOptionExternal: ProjectsOptionType[] = [];
 
@@ -32,8 +23,6 @@ const Config = () => {
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [options, setOptions] = useState([]);
   const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
-
-
 
   // Set the options
   useEffect(() => {
@@ -52,6 +41,7 @@ const Config = () => {
   // Get projects
   useEffect(() => {
     // if(!isToken)  return [];
+    console.log('useEffect, get projects');
     const pProjects = invoke("getProjects", {});
     pProjects.then((proj) => {
       console.log('projects: ', proj)
@@ -63,7 +53,7 @@ const Config = () => {
   // Get the documents
   useEffect(() => {
     // if(!isToken)  return [];
-    console.log('useEffect, get projects: ', projects);
+    console.log('useEffect, get documents');
     const dp = [];
     projects.forEach((project) => {
       const pDocuments = invoke("getDocuments", {projectID: project.id});
@@ -73,7 +63,6 @@ const Config = () => {
       });
     });
   }, [projects]);
-
 
 
   return (
@@ -109,7 +98,7 @@ const App = () => {
   const [options, setOptions] = useState([]);
   const [document, setDocument] = useState<MCDocument>(null);
 
-  const config = context?.extension.config || defaultConfig;
+  const config = context?.extension.config;
   const DiagramAction = config?.diagramAction;
   const projectID = config?.projectID;
 
