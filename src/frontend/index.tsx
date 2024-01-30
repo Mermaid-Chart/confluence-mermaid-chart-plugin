@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import ForgeReconciler, { Text, TextField, Option,
-  Select, Link, RadioGroup, Radio, Button,
-TextArea  } from "@forge/react";
+import ForgeReconciler, { Text, Option,
+  Select, RadioGroup, Radio, Image  } from "@forge/react";
 import { invoke, view } from "@forge/bridge";
-import { MCDocument, MCProject, fetchProjects } from '../api';
+import { MCDocument, MCProject } from '../api';
 import { router } from "@forge/bridge";
-
+import base64 from 'base-64'
 const BASE_URL = "https://test.mermaidchart.com/";
 
 type ProjectsOptionType = {
@@ -24,6 +23,8 @@ const Config = () => {
   const [options, setOptions] = useState([]);
   const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
   const [projAndDocOptions, setProjAndDocOptions] = useState([]);
+
+  const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
   // Set the options
   useEffect(() => {
@@ -64,7 +65,7 @@ const Config = () => {
         console.log('project.id ', project.id);
 
         (docs as MCDocument[]).forEach((doc) => {
-          projAndDocOptions.push({ id: doc.documentID, title: `${project.title}/${doc.title}}`});
+          projAndDocOptions.push({ id: doc.documentID, title: `${project.title}/${doc.title}`});
         });
         console.log('projAndDocOptions: ', projAndDocOptions);
         setProjAndDocOptions(projAndDocOptions);
@@ -86,6 +87,12 @@ const Config = () => {
           ))}
       </Select>
 
+      <Select label="Image Size" name="imageSize">
+        {imageSizes.map((s) => (
+            <Option label={s} value={s}/>
+          ))}
+      </Select>
+
       <RadioGroup label="Diagram Actions" name="diagramAction">
         <Radio label="None" value="None" defaultChecked/>
         <Radio label="Edit Diagram" value="Edit"/>
@@ -100,16 +107,36 @@ const Config = () => {
 
 const App = () => {
   const [context, setContext] = useState(undefined);
+  const [imgBody, setImageBody] = useState(null);
 
   const config = context?.extension.config;
   const DiagramAction = config?.diagramAction;
   const projectID = config?.projectID;
   const documentID = config?.documentID;
+  const imageSize = config?.imageSize;
 
   // Set the context
   useEffect(() => {
     view.getContext().then(setContext);
   }, []);
+
+  // Get the diagram SVG
+  useEffect(() => {
+
+    if(!documentID) return;
+
+    const pDocument = invoke("getDocument", {documentID: documentID});
+    pDocument.then((doc) => {
+      console.log('document: ', doc);
+      const pDocumentSVG = invoke("getDiagramSVG", {document: doc});
+      pDocumentSVG.then((result) => {
+        console.log('Use effect, getdiagram SVG:', result);
+        setImageBody(result);
+      });
+    });
+
+
+  }, [documentID]);
 
   const openDiagram = (documentID:string) => {
     console.log('In openDiagram, documentID: ', documentID);
@@ -129,6 +156,9 @@ const App = () => {
       return result;
     });
   }
+
+
+
 
   // Read the stored, last selected diagram action
   // and take action depending on the new selected diagram action
@@ -179,6 +209,7 @@ const App = () => {
       <Text>Selected DiagramAction is {DiagramAction}</Text>
       <Text>Selected ProjectID is {projectID}</Text>
       <Text>Selected DiagramID is {documentID}</Text>
+      <Image size={imageSize} src={`data:image/svg+xml;base64,${base64.encode(imgBody)}`} alt={document.title}/>
     </>
   );
 };
