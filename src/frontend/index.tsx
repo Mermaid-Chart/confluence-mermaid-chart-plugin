@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ForgeReconciler, { Text, Option,
-  Select, RadioGroup, Radio, Image  } from "@forge/react";
+  Select, RadioGroup, Radio, Image, TextArea  } from "@forge/react";
 import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject } from '../api';
 import { router } from "@forge/bridge";
@@ -21,24 +21,13 @@ type ProjAndDocOptionType = {
 const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
-  const [options, setOptions] = useState([]);
   const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
   const [projAndDocOptions, setProjAndDocOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
-  // Set the options
-  useEffect(() => {
-    //console.log('useEffect options called');
-    const projectOptions: ProjectsOptionType[] = [];
 
-    projects.forEach((project) => {
-      projectOptions.push({ id: project.id, title: project.title });
-    });
-
-    // console.log('projectOptions: ', projectOptions);
-    setOptions(projectOptions);
-  }, [projects]);
 
   // Get projects
   useEffect(() => {
@@ -54,30 +43,47 @@ const Config = () => {
 
   // Get the documents
   useEffect(() => {
-    // if(!isToken)  return [];
-    console.log('useEffect, get documents');
-    const dp = [];
-    const projAndDocOptions: ProjAndDocOptionType[] = [];
-    projects.forEach((project) => {
-      const pDocuments = invoke("getDocuments", {projectID: project.id});
-      pDocuments.then((docs) => {
-        dp.push(docs);
-        console.log('dp: ', dp);
-        console.log('project.id ', project.id);
+    if (projects.length === 0) {
+      setIsLoading(false);
+      return;
+    }
 
-        (docs as MCDocument[]).forEach((doc) => {
-          projAndDocOptions.push({ id: doc.documentID, title: `${project.title}/${doc.title}`});
+    const fetchDocumentsForAllProjects = async () => {
+      const docsPromises = projects.map(project =>
+        invoke("getDocuments", { projectID: project.id })
+      );
+
+      const docsResults = await Promise.all(docsPromises);
+      const newProjAndDocOptions = [];
+
+      docsResults.forEach((docs, index) => {
+        const project = projects[index];
+        (docs as MCDocument[]).forEach(doc => {
+          newProjAndDocOptions.push({ id: doc.documentID, title: `${project.title}/${doc.title}` });
         });
-        console.log('projAndDocOptions: ', projAndDocOptions);
-        setProjAndDocOptions(projAndDocOptions);
       });
-    });
-  }, [projects]);
+
+      setProjAndDocOptions(newProjAndDocOptions);
+      setIsLoading(false);
+    };
+
+    fetchDocumentsForAllProjects();
+  }, [projects, isToken]);
+
+
+
+  // Show indication until the projects and documents are loaded
+  if(isLoading) {
+    return (
+      <>
+        <TextArea label="Loading data..." name="Loading"/>
+      </>
+    );
+  }
+
 
   return (
     <>
-
-
       <Select label="Document for Edit/Refresh" name="documentID">
         {projAndDocOptions.map((p) => (
             <Option label={p.title} value={p.id}/>
@@ -127,7 +133,6 @@ const App = () => {
       console.log('document: ', doc);
       const pDocumentSVG = invoke("getDiagramSVG", {document: doc});
       pDocumentSVG.then((result) => {
-        console.log('Use effect, getdiagram SVG:', result);
         setImageBody(result);
       });
     });
