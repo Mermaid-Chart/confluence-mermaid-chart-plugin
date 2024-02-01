@@ -5,6 +5,7 @@ import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject } from '../api';
 import { router } from "@forge/bridge";
 import base64 from 'base-64'
+//const BASE_URL = "https://test.mermaidchart.com/";
 const BASE_URL = "https://test.mermaidchart.com/";
 
 type ProjectsOptionType = {
@@ -75,11 +76,7 @@ const Config = () => {
 
   return (
     <>
-      <Select label="Project for New Diagram" name="projectID">
-        {options.map((p) => (
-            <Option label={p.title} value={p.id}/>
-          ))}
-      </Select>
+
 
       <Select label="Document for Edit/Refresh" name="documentID">
         {projAndDocOptions.map((p) => (
@@ -157,6 +154,11 @@ const App = () => {
     });
   }
 
+  const gotoCreateDiagram = () => {
+    console.log('In gotoCreateDiagram');
+    const diagramURL = `${BASE_URL}app/create-diagram?ref=vscode`
+    router.open(diagramURL);
+  }
 
 
 
@@ -175,9 +177,7 @@ const App = () => {
         console.log('result: ', result);
 
         // Create a new diagram
-        const newDiagram = createNewDiagram(projectID).then((result) => {
-          console.log('In App, newDiagram: ', result);
-        });
+        gotoCreateDiagram();
       });
     }
 
