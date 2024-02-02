@@ -8,11 +8,13 @@ import base64 from 'base-64'
 //const BASE_URL = "https://test.mermaidchart.com/";
 const BASE_URL = "https://test.mermaidchart.com/";
 
+// Option type for selection of project
 type ProjectsOptionType = {
   id: string;
   title: string;
 }
 
+// Option type for selection of document in a proect
 type ProjAndDocOptionType = {
   id: string;
   title: string;
@@ -21,30 +23,35 @@ type ProjAndDocOptionType = {
 const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
-  const [documents, setDocuments] = useState<MCDocument[]>([] as MCDocument[]);
   const [projAndDocOptions, setProjAndDocOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
 
+  // Get the token
+  useEffect(() => {
+    const pToken = invoke("getTokenExist", {});
+    pToken.then((token) => {
+      console.log('token: ', token);
+      setToken(token);
+    });
+  }, []);
 
   // Get projects
   useEffect(() => {
-    // if(!isToken)  return [];
+    if(!isToken)  return;
     console.log('useEffect, get projects');
+
     const pProjects = invoke("getProjects", {});
     pProjects.then((proj) => {
       console.log('projects: ', proj)
       setProjects(proj as MCProject[]);
     });
-
   }, [isToken]);
 
   // Get the documents
   useEffect(() => {
     if (projects.length === 0) {
-      setIsLoading(false);
       return;
     }
 
@@ -63,24 +70,11 @@ const Config = () => {
         });
       });
 
-      setProjAndDocOptions(newProjAndDocOptions);
-      setIsLoading(false);
+      setProjAndDocOptions(newProjAndDocOptions as ProjAndDocOptionType[]);
     };
 
     fetchDocumentsForAllProjects();
   }, [projects, isToken]);
-
-
-
-  // Show indication until the projects and documents are loaded
-  if(isLoading) {
-    return (
-      <>
-        <TextArea label="Loading data..." name="Loading"/>
-      </>
-    );
-  }
-
 
   return (
     <>
