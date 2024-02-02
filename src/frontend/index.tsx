@@ -91,7 +91,7 @@ const Config = () => {
       </Select>
 
       <RadioGroup label="Diagram Actions" name="diagramAction">
-        <Radio label="None" value="None" defaultChecked/>
+        {/* <Radio label="None" value="None" defaultChecked/> */}
         <Radio label="Edit Diagram" value="Edit"/>
         <Radio label="Refresh Diagram" value="Refresh"/>
         <Radio label="Create new Diagram" value="Create"/>
@@ -172,7 +172,7 @@ const App = () => {
 
     // A new diagram shall be created
     // and route the user to editor of the new diagram
-    if(DiagramAction == "Create" && result == "None") {
+    if(DiagramAction == "Create" && result != "Create") {
       // Update the stored diagram action
       invoke("storeDiagramAction", {diagramAction: "Create"}).then((result) => {
         console.log('result: ', result);
@@ -184,33 +184,40 @@ const App = () => {
 
     // An existing diagram shall be edited.
     // Route the user to editor of the new diagram
-    if(DiagramAction == "Edit" && result == "None") {
+    if(DiagramAction == "Edit" && result != "Edit") {
       // Update the stored diagram action
       invoke("storeDiagramAction", {diagramAction: "Edit"}).then((result) => {
         console.log('result: ', result);
 
         // Open the diagram
-        openDiagram(config.documentID);
+        if(config.documentID) {
+          openDiagram(config.documentID);
+        }
       });
     }
 
     // An existing diagram shall be refreshed.
-    if(DiagramAction == "Refresh" && result == "None") {
+    if(DiagramAction == "Refresh" && result != "Refresh") {
       // Update the stored diagram action
-      if(config.documentID) {
-        updateDiagramSVG(config.documentID);
-      }
+      invoke("storeDiagramAction", {diagramAction: "Refresh"}).then((result) => {
+        console.log('result: ', result);
+
+        // Update the diagram SVG
+        if(config.documentID) {
+          updateDiagramSVG(config.documentID);
+        }
+      });
     }
 
   });
 
   // Shall be able to reset the stored diagram action to "None"
-  if(DiagramAction == "None" ) {
-    // Update the stored diagram action (previous)
-    invoke("storeDiagramAction", {diagramAction: "None"}).then((result) => {
-      console.log('result: ', result);
-    });
-  }
+  // if(DiagramAction == "None" ) {
+  //   // Update the stored diagram action (previous)
+  //   invoke("storeDiagramAction", {diagramAction: "None"}).then((result) => {
+  //     console.log('result: ', result);
+  //   });
+  // }
 
   return (
     <>
