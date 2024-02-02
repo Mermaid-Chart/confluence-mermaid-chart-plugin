@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ForgeReconciler, { Text, Option,
-  Select, RadioGroup, Radio, Image, TextArea  } from "@forge/react";
+  Select, RadioGroup, Radio, Image, TextField  } from "@forge/react";
 import { invoke, view } from "@forge/bridge";
 import { MCDocument, MCProject } from '../api';
 import { router } from "@forge/bridge";
@@ -24,7 +24,7 @@ const Config = () => {
   const [isToken, setToken] = useState(null);
   const [projects, setProjects] = useState<MCProject[]>([] as MCProject[]);
   const [projAndDocOptions, setProjAndDocOptions] = useState([]);
-
+  const [inputValue, setInputValue] = useState("");
   const imageSizes = ['xsmall', 'small', 'medium', 'large', 'xlarge'];
 
 
@@ -90,6 +90,13 @@ const Config = () => {
           ))}
       </Select>
 
+      <TextField
+        label="Caption"
+        name="caption"
+        value={inputValue}
+        onChange={(value) => setInputValue(value)}
+      />
+
       <RadioGroup label="Diagram Actions" name="diagramAction">
         {/* <Radio label="None" value="None" defaultChecked/> */}
         <Radio label="Edit Diagram" value="Edit"/>
@@ -111,6 +118,7 @@ const App = () => {
   const projectID = config?.projectID;
   const documentID = config?.documentID;
   const imageSize = config?.imageSize;
+  const caption = config?.caption;
 
   // Set the context
   useEffect(() => {
@@ -226,6 +234,7 @@ const App = () => {
       <Text>Selected ProjectID is {projectID}</Text>
       <Text>Selected DiagramID is {documentID}</Text>
       <Image size={imageSize} src={`data:image/svg+xml;base64,${base64.encode(imgBody)}`} alt={document.title}/>
+      <Text>{caption}</Text>
     </>
   );
 };
