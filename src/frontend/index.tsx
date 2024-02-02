@@ -121,7 +121,13 @@ const App = () => {
   useEffect(() => {
 
     if(!documentID) return;
+    updateDiagramSVG(documentID);
 
+  }, [documentID]);
+
+
+  const updateDiagramSVG = async (documentID:string) => {
+    console.log('In updateDiagramSVG, documentID: ', documentID);
     const pDocument = invoke("getDocument", {documentID: documentID});
     pDocument.then((doc) => {
       console.log('document: ', doc);
@@ -130,9 +136,7 @@ const App = () => {
         setImageBody(result);
       });
     });
-
-
-  }, [documentID]);
+  }
 
   const openDiagram = (documentID:string) => {
     console.log('In openDiagram, documentID: ', documentID);
@@ -158,8 +162,6 @@ const App = () => {
     const diagramURL = `${BASE_URL}app/create-diagram?ref=vscode`
     router.open(diagramURL);
   }
-
-
 
   // Read the stored, last selected diagram action
   // and take action depending on the new selected diagram action
@@ -190,6 +192,14 @@ const App = () => {
         // Open the diagram
         openDiagram(config.documentID);
       });
+    }
+
+    // An existing diagram shall be refreshed.
+    if(DiagramAction == "Refresh" && result == "None") {
+      // Update the stored diagram action
+      if(config.documentID) {
+        updateDiagramSVG(config.documentID);
+      }
     }
 
   });
